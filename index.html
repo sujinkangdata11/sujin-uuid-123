@@ -2,8 +2,15 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Emoji DB - 이모지 복사 키보드 | 무료 이모지 모음</title>
+    
+    <!-- PWA 메타태그 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Emoji DB">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#007bff">
     <meta name="description" content="12개 카테고리 수천개 이모지를 한번에! 클릭으로 쉽게 복사하고 여러개 모아서 복사까지. 사람, 손, 인종, 직업, 사랑, 음식 이모지 등 모든 이모지가 한곳에.">
     <meta name="keywords" content="이모지, emoji, 이모티콘, 복사, 붙여넣기, 키보드, 이모지 모음, 무료, 온라인, 카테고리, 검색">
     <meta name="author" content="Emoji DB">
@@ -36,10 +43,19 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --vh: 1vh;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* 모바일에서 텍스트 크기 자동 조정 방지 */
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
         }
 
         .header {
@@ -143,6 +159,25 @@
 
         .emoji-item:active {
             transform: scale(0.95);
+        }
+
+        /* iOS에서 터치시 회색 하이라이트 방지 */
+        .emoji-item, .tab, .copy-all-btn, .clear-btn {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* 검색 박스 iOS 스타일링 개선 */
+        .search-box {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 25px;
         }
 
         .sidebar {
@@ -313,9 +348,46 @@
 
 
         @media (max-width: 768px) {
+            .container {
+                padding: 5px 10px;
+            }
+            
+            .header {
+                padding: 8px 15px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
             .main-content {
-                flex-direction: column;
-                align-items: center;
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .emoji-section {
+                padding: 20px 15px;
+            }
+            
+            .search-box {
+                padding: 12px 15px;
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .search-box::placeholder {
+                font-size: 16px;
+            }
+            
+            .category-tabs {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 14px;
+                border-radius: 15px;
             }
             
             .emoji-grid {
@@ -327,12 +399,221 @@
                 width: 50px;
                 height: 50px;
                 font-size: 28px;
+                border-radius: 8px;
+            }
+            
+            .emoji-item:hover {
+                transform: scale(1.2);
+            }
+            
+            .ad-banner, .category-divider {
+                height: 80px;
+                font-size: 14px;
+                margin: 15px 0;
             }
             
             .ad-sidebar {
-                height: 200px;
+                height: 120px;
                 writing-mode: horizontal-tb;
                 text-orientation: mixed;
+                order: -1;
+            }
+            
+            .bottom-ad {
+                height: 80px;
+                font-size: 14px;
+            }
+            
+            .floating-emoji-box {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                transform: none;
+                min-width: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .emoji-collector {
+                flex: 1 1 100%;
+                order: 1;
+                min-height: 35px;
+                font-size: 14px;
+                padding: 8px 12px;
+                margin-bottom: 5px;
+            }
+            
+            .emoji-collector:not(:empty):not([data-placeholder]) {
+                font-size: 18px;
+            }
+            
+            .copy-all-btn {
+                flex: 1 1 calc(60% - 4px);
+                order: 2;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .clear-btn {
+                flex: 1 1 calc(40% - 4px);
+                order: 3;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .copy-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100px);
+                text-align: center;
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            
+            .copy-notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .emoji-section {
+                padding: 15px 10px;
+            }
+            
+            .search-box {
+                padding: 10px 12px;
+                font-size: 15px;
+            }
+            
+            .category-tabs {
+                gap: 4px;
+            }
+            
+            .tab {
+                padding: 6px 10px;
+                font-size: 13px;
+                border-radius: 12px;
+            }
+            
+            .emoji-grid {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+                gap: 6px;
+            }
+            
+            .emoji-item {
+                width: 45px;
+                height: 45px;
+                font-size: 24px;
+            }
+            
+            .floating-emoji-box {
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            .emoji-collector {
+                min-height: 32px;
+                font-size: 13px;
+                padding: 6px 10px;
+                margin-bottom: 3px;
+            }
+            
+            .emoji-collector:not(:empty):not([data-placeholder]) {
+                font-size: 16px;
+            }
+            
+            .copy-all-btn {
+                flex: 1 1 calc(65% - 3px);
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            
+            .clear-btn {
+                flex: 1 1 calc(35% - 3px);
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .emoji-grid {
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+                gap: 4px;
+            }
+            
+            .emoji-item {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+            
+            .tab {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+            
+            .floating-emoji-box {
+                padding: 6px;
+                gap: 4px;
+            }
+            
+            .emoji-collector {
+                min-height: 28px;
+                font-size: 12px;
+                padding: 5px 8px;
+                margin-bottom: 2px;
+            }
+            
+            .emoji-collector:not(:empty):not([data-placeholder]) {
+                font-size: 14px;
+            }
+            
+            .copy-all-btn {
+                flex: 1 1 calc(70% - 2px);
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            
+            .clear-btn {
+                flex: 1 1 calc(30% - 2px);
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* 터치 디바이스 최적화 */
+        @media (hover: none) and (pointer: coarse) {
+            .emoji-item {
+                transition: all 0.1s ease;
+            }
+            
+            .emoji-item:hover {
+                transform: none;
+                background: #e9ecef;
+            }
+            
+            .emoji-item:active {
+                transform: scale(0.9);
+                background: #dee2e6;
+            }
+            
+            .tab:hover {
+                background: #f8f9fa;
+            }
+            
+            .tab.active:hover {
+                background: #007bff;
             }
         }
     </style>
@@ -478,10 +759,40 @@
 
         // 이모지 복사 함수
         function copyEmoji(emoji) {
+            // 터치 피드백 추가
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
             navigator.clipboard.writeText(emoji).then(() => {
                 showCopyNotification(emoji);
                 addToCollector(emoji);
+            }).catch(() => {
+                // 클립보드 API가 실패한 경우 대체 방법
+                fallbackCopyTextToClipboard(emoji);
+                showCopyNotification(emoji);
+                addToCollector(emoji);
             });
+        }
+
+        // 클립보드 복사 대체 함수 (HTTPS가 아닌 환경에서)
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Fallback: 복사 실패', err);
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         // 플로팅 박스에 이모지 추가
@@ -560,9 +871,17 @@
         document.getElementById('copyAllBtn').addEventListener('click', () => {
             const collector = document.getElementById('emojiCollector');
             const allEmojisText = collector.textContent;
-            if (allEmojisText) {
+            if (allEmojisText && allEmojisText !== '이모지를 클릭하세요') {
+                // 터치 피드백
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+                
                 navigator.clipboard.writeText(allEmojisText).then(() => {
-                    showCopyNotification(`${allEmojisText} 복사완료!`);
+                    showCopyNotification(`복사완료! ${allEmojisText}`);
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(allEmojisText);
+                    showCopyNotification(`복사완료! ${allEmojisText}`);
                 });
             }
         });
@@ -573,6 +892,75 @@
             collector.textContent = '이모지를 클릭하세요';
             collector.setAttribute('data-placeholder', 'true');
         });
+
+        // 터치 시작 및 스크롤 방지 (이모지 아이템에서)
+        let touchStartY = 0;
+        let isScrolling = false;
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('emoji-item')) {
+                touchStartY = e.touches[0].clientY;
+                isScrolling = false;
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.classList.contains('emoji-item')) {
+                const touchY = e.touches[0].clientY;
+                const deltaY = Math.abs(touchY - touchStartY);
+                
+                if (deltaY > 10) {
+                    isScrolling = true;
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (e.target.classList.contains('emoji-item') && !isScrolling) {
+                e.preventDefault();
+                const emoji = e.target.textContent;
+                copyEmoji(emoji);
+            }
+        }, { passive: false });
+
+        // 모바일에서 더블탭 줌 방지
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // iOS Safari에서 바운스 스크롤 방지 (필요한 영역에서만)
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.closest('.floating-emoji-box') && 
+                !e.target.closest('.emoji-collector')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // 화면 회전 감지 및 레이아웃 재조정
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                // 화면 회전 후 레이아웃 재계산
+                if (currentCategory === 'all') {
+                    renderEmojis(allEmojis, true);
+                } else {
+                    renderEmojis(emojiData[currentCategory] || []);
+                }
+            }, 500);
+        });
+
+        // 뷰포트 높이 조정 (모바일 브라우저 주소창 대응)
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        setViewportHeight();
+        window.addEventListener('resize', setViewportHeight);
 
         // 초기화
         allEmojis = getAllEmojis();
