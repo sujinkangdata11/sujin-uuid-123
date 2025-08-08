@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emojidb.com/sitemap.xml
