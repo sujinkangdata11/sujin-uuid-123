@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이모지 키보드 - Emoji Copy & Paste</title>
+    <meta name="description" content="이모지를 쉽게 복사하고 붙여넣기하세요. 카테고리별 이모지 검색과 한 번의 클릭으로 복사 기능을 제공합니다.">
+    <meta name="keywords" content="이모지, emoji, 복사, 붙여넣기, 키보드, 이모티콘">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .lang-selector {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 120px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .emoji-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            margin-bottom: 30px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #007bff;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .emoji-item {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            background: #f8f9fa;
+        }
+
+        .emoji-item:hover {
+            background: #e9ecef;
+            transform: scale(1.1);
+        }
+
+        .emoji-item:active {
+            transform: scale(0.95);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ad-sidebar {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            height: 400px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active:hover {
+            background: #0056b3;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .copy-notification.show {
+            transform: translateX(0);
+        }
+
+        .bottom-ad {
+            background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+            height: 100px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .emoji-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                gap: 8px;
+            }
+            
+            .emoji-item {
+                width: 50px;
+                height: 50px;
+                font-size: 28px;
+            }
+            
+            .ad-sidebar {
+                height: 200px;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Emoji Engine</div>
+        <div class="lang-selector">Change Language ⌄</div>
+    </header>
+
+    <div class="container">
+        <!-- 상단 광고 -->
+        <div class="ad-banner">
+            광고 영역 - 상단 배너
+        </div>
+
+        <div class="main-content">
+            <div class="emoji-section">
+                <input type="text" class="search-box" placeholder="검색..." id="searchInput">
+                
+                <div class="category-tabs">
+                    <!-- 사용자가 이해하기 쉽도록 카테고리를 재구성했습니다. -->
+                    <div class="tab active" data-category="all">전체</div>
+                    <div class="tab" data-category="people">사람·표정</div>
+                    <div class="tab" data-category="nature">동물·자연</div>
+                    <div class="tab" data-category="food">음식·음료</div>
+                    <div class="tab" data-category="activities">활동</div>
+                    <div class="tab" data-category="travel">여행·장소</div>
+                    <div class="tab" data-category="objects">사물</div>
+                    <div class="tab" data-category="symbols">기호</div>
+                    <div class="tab" data-category="flags">국기</div>
+                </div>
+
+                <div class="emoji-grid" id="emojiGrid">
+                    <!-- 이모지들이 여기에 동적으로 추가됩니다 -->
+                </div>
+
+                <!-- 하단 광고 -->
+                <div class="bottom-ad">
+                    광고 영역 - 하단 배너
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="ad-sidebar">
+                    사이드바 광고
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 복사 알림 -->
+    <div class="copy-notification" id="copyNotification">
+        <!-- 자바스크립트로 내용이 채워집니다 -->
+    </div>
+
+    <script src="emoji-data.js"></script>
+
+    <script>
+        // 이모지 데이터 (now loaded from external emoji-data.js)
+        var emojiData = window.emojiData || {};
+
+        let currentCategory = 'all';
+        let allEmojis = [];
+        let notificationTimer;
+
+        // 모든 이모지를 하나의 배열로 합치기
+        function getAllEmojis() {
+            const all = [];
+            for (const category in emojiData) {
+                all.push(...emojiData[category]);
+            }
+            return all;
+        }
+
+        // 이모지 그리드 렌더링
+        function renderEmojis(emojis) {
+            const grid = document.getElementById('emojiGrid');
+            grid.innerHTML = '';
+            
+            emojis.forEach(emoji => {
+                const item = document.createElement('div');
+                item.className = 'emoji-item';
+                item.textContent = emoji;
+                item.onclick = () => copyEmoji(emoji);
+                grid.appendChild(item);
+            });
+        }
+
+        // 이모지 복사 함수
+        function copyEmoji(emoji) {
+            navigator.clipboard.writeText(emoji).then(() => {
+                showCopyNotification(emoji);
+            });
+        }
+
+        // 복사 알림 표시
+        function showCopyNotification(copiedEmoji) {
+            const notification = document.getElementById('copyNotification');
+            notification.textContent = `이모지가 복사되었습니다! ${copiedEmoji}`;
+            notification.classList.add('show');
+            
+            if (notificationTimer) {
+                clearTimeout(notificationTimer);
+            }
+
+            notificationTimer = setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // 카테고리 탭 클릭 이벤트
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 활성 탭 변경
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 카테고리 변경
+                currentCategory = tab.dataset.category;
+                
+                if (currentCategory === 'all') {
+                    renderEmojis(allEmojis);
+                } else {
+                    renderEmojis(emojiData[currentCategory] || []);
+                }
+            });
+        });
+
+        // 검색 기능
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (!searchTerm) {
+                if (currentCategory === 'all') {
+                    renderEmojis(allEmojis);
+                } else {
+                    renderEmojis(emojiData[currentCategory] || []);
+                }
+                return;
+            }
+
+            // 이모지 검색을 위한 키워드 매핑 (external emoji-data.js에서 로드)
+            const emojiKeywords = window.emojiKeywords || {};
+
+            let searchResults = [];
+            
+            for (const emoji of allEmojis) {
+                const keywords = emojiKeywords[emoji] || [];
+                if (keywords.some(keyword => keyword.includes(searchTerm))) {
+                    searchResults.push(emoji);
+                }
+            }
+            
+            renderEmojis(searchResults);
+        });
+
+        // 초기화
+        allEmojis = getAllEmojis();
+        renderEmojis(allEmojis);
+    </script>
+</body>
+</html>
