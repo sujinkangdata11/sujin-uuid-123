@@ -91,19 +91,18 @@ class Navigation {
         // 동적으로 로드된 페이지의 script 태그들을 실행
         const scripts = container.querySelectorAll('script');
         scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if (script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.head.appendChild(newScript);
-            // 실행 후 제거 (중복 방지)
-            setTimeout(() => {
-                if (newScript.parentNode) {
-                    newScript.parentNode.removeChild(newScript);
+            try {
+                if (script.src) {
+                    // 외부 스크립트는 스킵 (이미 로드된 것으로 가정)
+                    return;
+                } else {
+                    // 인라인 스크립트를 직접 실행
+                    const scriptFunction = new Function(script.textContent);
+                    scriptFunction();
                 }
-            }, 100);
+            } catch (error) {
+                console.error('스크립트 실행 오류:', error);
+            }
         });
     }
 }
