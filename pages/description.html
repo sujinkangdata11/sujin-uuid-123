@@ -1,0 +1,715 @@
+<div class="search-with-random">
+    <button class="random-dice-btn" id="randomDiceBtn" title="랜덤 이모지">🎲 랜덤</button>
+    <input type="text" class="search-box" placeholder="이모지나 설명 검색..." id="descriptionSearchInput">
+</div>
+
+<!-- 이모지 설명 목록 -->
+<div class="emoji-descriptions" id="emojiDescriptions">
+    <!-- JavaScript로 동적 생성 -->
+</div>
+
+<!-- 하단 광고 -->
+<div class="bottom-ad">
+    광고 영역 - 하단 배너
+</div>
+
+<style>
+/* 이모지 페이지와 동일한 검색박스와 카테고리 탭 스타일 사용 */
+
+.search-with-random {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.search-with-random .search-box {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.random-dice-btn {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #e9ecef;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 54px;
+    line-height: 1;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.random-dice-btn:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+}
+
+.random-dice-btn:active {
+    transform: scale(0.95);
+}
+
+.random-dice-btn.spinning {
+    animation: spin 0.5s ease-in-out;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.emoji-descriptions {
+    display: grid;
+    gap: 15px;
+}
+
+.emoji-desc-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.emoji-desc-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.1);
+    transform: translateY(-2px);
+}
+
+.emoji-desc-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.emoji-large {
+    font-size: 36px;
+    flex-shrink: 0;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    min-height: 52px;
+}
+
+.emoji-info {
+    flex: 1;
+}
+
+.emoji-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.emoji-description {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.emoji-usage {
+    font-size: 13px;
+    color: #999;
+    font-style: italic;
+}
+
+.emoji-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.emoji-tag {
+    background: #f1f3f5;
+    color: #495057;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.copy-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.emoji-desc-item {
+    position: relative;
+}
+
+.emoji-desc-item.copied .copy-indicator {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .search-with-random {
+        gap: 8px;
+    }
+    
+    .random-dice-btn {
+        font-size: 14px;
+        padding: 10px 12px;
+        height: 46px;
+        gap: 4px;
+    }
+    
+    .emoji-desc-item {
+        padding: 15px;
+    }
+    
+    .emoji-large {
+        font-size: 28px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .emoji-name {
+        font-size: 16px;
+    }
+    
+    .emoji-description {
+        font-size: 13px;
+    }
+    
+    .emoji-usage {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-with-random {
+        gap: 6px;
+    }
+    
+    .random-dice-btn {
+        font-size: 13px;
+        padding: 8px 10px;
+        height: 42px;
+        gap: 3px;
+    }
+    
+    .emoji-desc-header {
+        gap: 12px;
+    }
+    
+    .emoji-large {
+        font-size: 24px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    .emoji-name {
+        font-size: 15px;
+    }
+}
+
+/* 랜덤 이모지 컨테이너 스타일 */
+.random-emoji-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.random-emoji-box {
+    width: 300px;
+    height: 300px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.random-emoji-box:hover {
+    transform: translateY(-3px);
+    background: #e9ecef;
+    border-color: #007bff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.random-emoji-display {
+    font-size: 80px;
+    line-height: 1;
+    margin-bottom: 20px;
+    text-align: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.random-emoji-text {
+    text-align: center;
+    color: #333;
+}
+
+.random-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.random-subtitle {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.random-info {
+    text-align: center;
+    color: #666;
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.random-info p {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+}
+
+.random-info p:last-child {
+    margin-bottom: 0;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.copy-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(40, 167, 69, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.random-emoji-box.copied .copy-indicator {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .random-emoji-box {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .random-emoji-display {
+        font-size: 65px;
+        margin-bottom: 15px;
+    }
+    
+    .random-title {
+        font-size: 18px;
+    }
+    
+    .random-subtitle {
+        font-size: 13px;
+    }
+    
+    .random-info p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .random-emoji-container {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .random-emoji-box {
+        width: 200px;
+        height: 200px;
+        border-radius: 15px;
+    }
+    
+    .random-emoji-display {
+        font-size: 50px;
+        margin-bottom: 12px;
+    }
+    
+    .random-title {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+    
+    .random-subtitle {
+        font-size: 12px;
+    }
+    
+    .random-info {
+        max-width: 300px;
+    }
+    
+    .random-info p {
+        font-size: 13px;
+    }
+}
+</style>
+
+<script>
+// 이모지 설명 데이터
+const emojiDescriptionData = {
+    popular: [
+        {emoji: '😀', name: '활짝 웃는 얼굴', description: '기쁘고 행복한 기분을 표현할 때 사용하는 기본적인 웃는 이모지입니다.', usage: '좋은 소식이나 기쁜 일이 있을 때', tags: ['웃음', '행복', '기쁨', '긍정']},
+        {emoji: '😂', name: '기쁨의 눈물', description: '너무 웃겨서 눈물이 날 정도로 웃을 때 사용합니다.', usage: '매우 재미있는 상황이나 농담에', tags: ['웃음', '재밌음', '눈물', '극웃']},
+        {emoji: '❤️', name: '빨간 하트', description: '사랑과 애정을 표현하는 가장 기본적인 하트 이모지입니다.', usage: '사랑하는 사람에게 마음을 전할 때', tags: ['사랑', '애정', '하트', '로맨스']},
+        {emoji: '👍', name: '좋아요', description: '동의하거나 긍정적인 반응을 표현할 때 사용합니다.', usage: '누군가의 의견에 동의하거나 격려할 때', tags: ['좋음', '동의', '긍정', '격려']},
+        {emoji: '🔥', name: '불꽃', description: '뜨거운 관심이나 인기, 멋진 것을 표현할 때 사용합니다.', usage: '트렌디하거나 인기 있는 것을 강조할 때', tags: ['핫', '인기', '멋짐', '트렌드']},
+    ],
+    people: [
+        {emoji: '😊', name: '미소 짓는 얼굴', description: '부드럽고 온화한 미소를 표현하는 이모지입니다.', usage: '친근함이나 감사함을 표현할 때', tags: ['미소', '친근', '온화', '감사']},
+        {emoji: '😍', name: '하트 눈', description: '무언가에 반했거나 매우 좋아할 때 사용합니다.', usage: '좋아하는 것을 보거나 반했을 때', tags: ['반함', '좋아함', '사랑', '매력']},
+        {emoji: '😭', name: '큰 소리로 우는 얼굴', description: '매우 슬프거나 감동받았을 때 사용하는 이모지입니다.', usage: '매우 슬픈 상황이나 감동적인 순간에', tags: ['울음', '슬픔', '감동', '눈물']},
+        {emoji: '😴', name: '잠자는 얼굴', description: '졸리거나 잠들었을 때 사용하는 이모지입니다.', usage: '잠이 올 때나 지쳤을 때', tags: ['잠', '졸림', '피곤', '수면']},
+    ],
+    nature: [
+        {emoji: '🐶', name: '강아지 얼굴', description: '귀엽고 충성스러운 강아지를 나타내는 이모지입니다.', usage: '애완동물이나 귀여운 것을 표현할 때', tags: ['강아지', '귀여움', '애완동물', '충성']},
+        {emoji: '🌸', name: '벚꽃', description: '봄과 아름다움을 상징하는 벚꽃 이모지입니다.', usage: '봄철이나 아름다운 순간을 표현할 때', tags: ['봄', '꽃', '아름다움', '계절']},
+        {emoji: '🌟', name: '별', description: '특별함이나 우수함을 나타내는 별 모양 이모지입니다.', usage: '뭔가 특별하거나 훌륭할 때', tags: ['특별', '별', '우수', '반짝']},
+    ],
+    food: [
+        {emoji: '🍕', name: '피자', description: '인기 있는 패스트푸드인 피자를 나타내는 이모지입니다.', usage: '음식 얘기나 파티 분위기를 연출할 때', tags: ['피자', '음식', '파티', '맛있음']},
+        {emoji: '🍰', name: '케이크', description: '생일이나 축하할 일이 있을 때 사용하는 케이크 이모지입니다.', usage: '생일이나 기념일 축하할 때', tags: ['케이크', '생일', '축하', '달콤']},
+        {emoji: '☕', name: '커피', description: '커피나 따뜻한 음료를 나타내는 이모지입니다.', usage: '아침이나 휴식 시간을 표현할 때', tags: ['커피', '아침', '휴식', '따뜻']},
+    ],
+    symbols: [
+        {emoji: '✨', name: '반짝임', description: '마법같거나 특별한 순간을 표현하는 반짝이는 별들입니다.', usage: '뭔가 마법같거나 특별할 때', tags: ['반짝', '마법', '특별', '빛']},
+        {emoji: '💯', name: '백점', description: '완벽하거나 최고임을 표현하는 100점 이모지입니다.', usage: '완벽하거나 최고의 결과를 얻었을 때', tags: ['완벽', '최고', '100점', '성공']},
+        {emoji: '🎉', name: '파티 크래커', description: '축하하거나 파티 분위기를 연출할 때 사용합니다.', usage: '성공이나 좋은 일을 축하할 때', tags: ['축하', '파티', '성공', '기념']},
+    ]
+};
+
+class DescriptionManager {
+    constructor() {
+        this.allDescriptions = this.getAllDescriptions();
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.renderDescriptions(this.allDescriptions);
+    }
+
+    bindEvents() {
+        console.log('이벤트 바인딩 시작');
+        
+        // 검색 기능
+        const searchInput = document.getElementById('descriptionSearchInput');
+        console.log('검색 입력창:', searchInput);
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.handleSearch(e.target.value);
+            });
+        }
+
+        // 랜덤 주사위 버튼
+        const randomBtn = document.getElementById('randomDiceBtn');
+        console.log('랜덤 버튼:', randomBtn);
+        if (randomBtn) {
+            console.log('랜덤 버튼 이벤트 리스너 추가');
+            randomBtn.addEventListener('click', (e) => {
+                console.log('랜덤 버튼 클릭 이벤트 발생!');
+                e.preventDefault();
+                this.handleRandomClick();
+            });
+            
+            // 추가 테스트용 - onclick도 설정
+            randomBtn.onclick = () => {
+                console.log('onclick으로 랜덤 버튼 클릭됨');
+                this.handleRandomClick();
+            };
+        } else {
+            console.error('랜덤 버튼을 찾을 수 없음!');
+        }
+    }
+
+    getAllDescriptions() {
+        const all = [];
+        for (const category in emojiDescriptionData) {
+            all.push(...emojiDescriptionData[category].map(item => ({...item, category})));
+        }
+        return all;
+    }
+
+    handleSearch(searchTerm) {
+        if (!searchTerm.trim()) {
+            this.renderDescriptions(this.allDescriptions);
+            return;
+        }
+
+        const filtered = this.allDescriptions.filter(item => {
+            const searchLower = searchTerm.toLowerCase();
+            return item.name.toLowerCase().includes(searchLower) ||
+                   item.description.toLowerCase().includes(searchLower) ||
+                   item.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+                   item.emoji.includes(searchTerm);
+        });
+
+        this.renderDescriptions(filtered);
+    }
+
+    handleRandomClick() {
+        console.log('랜덤 버튼 클릭됨'); // 디버깅용
+        
+        const randomBtn = document.getElementById('randomDiceBtn');
+        const searchInput = document.getElementById('descriptionSearchInput');
+        
+        // 주사위 회전 애니메이션
+        if (randomBtn) {
+            randomBtn.classList.add('spinning');
+            setTimeout(() => {
+                randomBtn.classList.remove('spinning');
+            }, 500);
+        }
+
+        // 터치 피드백
+        if (navigator.vibrate) {
+            navigator.vibrate([50, 50, 100]);
+        }
+
+        // emoji-data.js에서 랜덤 이모지 선택
+        const randomEmoji = this.getRandomEmojiFromData();
+        console.log('선택된 랜덤 이모지:', randomEmoji); // 디버깅용
+        
+        // 검색창 비우기
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        // 랜덤 이모지 표시 (설명 없는 형태)
+        this.renderRandomEmoji(randomEmoji);
+        
+        // 랜덤 이모지 알림
+        setTimeout(() => {
+            showCopyNotificationFromDesc(`🎲 랜덤 이모지: ${randomEmoji}!`);
+        }, 300);
+    }
+
+    getRandomEmojiFromData() {
+        console.log('window.emojiData 상태:', window.emojiData); // 디버깅용
+        
+        // emoji-data.js의 모든 이모지를 하나의 배열로 합치기
+        if (!window.emojiData) {
+            console.log('emoji-data.js 없음, 기본 데이터 사용');
+            // emoji-data.js가 로드되지 않은 경우 기본 데이터 사용
+            const randomIndex = Math.floor(Math.random() * this.allDescriptions.length);
+            return this.allDescriptions[randomIndex].emoji;
+        }
+
+        const allEmojis = [];
+        for (const category in window.emojiData) {
+            allEmojis.push(...window.emojiData[category]);
+        }
+
+        console.log('전체 이모지 개수:', allEmojis.length); // 디버깅용
+
+        // 랜덤 선택
+        const randomIndex = Math.floor(Math.random() * allEmojis.length);
+        return allEmojis[randomIndex];
+    }
+
+    renderRandomEmoji(emoji) {
+        const container = document.getElementById('emojiDescriptions');
+        if (!container) return;
+
+        // 랜덤 이모지 전용 카드 렌더링 (300px 정사각형, 80px 이모지)
+        container.innerHTML = `
+            <div class="random-emoji-container">
+                <div class="random-emoji-box" onclick="copyEmojiFromDesc('${emoji}', this)">
+                    <div class="random-emoji-display">${emoji}</div>
+                    <div class="random-emoji-text">
+                        <div class="random-title">🎲 랜덤 이모지</div>
+                        <div class="random-subtitle">클릭해서 복사하세요!</div>
+                    </div>
+                    <div class="copy-indicator">복사됨!</div>
+                </div>
+                <div class="random-info">
+                    <p>이 이모지는 ${this.getEmojiCount()}개의 이모지 중에서 랜덤으로 선택되었습니다!</p>
+                    <p>다시 🎲 랜덤 버튼을 누르면 새로운 이모지를 만날 수 있어요.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    getEmojiCount() {
+        if (!window.emojiData) return '3000+';
+        
+        let count = 0;
+        for (const category in window.emojiData) {
+            count += window.emojiData[category].length;
+        }
+        return count.toLocaleString();
+    }
+
+    renderDescriptions(descriptions) {
+        const container = document.getElementById('emojiDescriptions');
+        if (!container) return;
+
+        if (descriptions.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">검색 결과가 없습니다.</div>';
+            return;
+        }
+
+        container.innerHTML = descriptions.map(item => `
+            <div class="emoji-desc-item" onclick="copyEmojiFromDesc('${item.emoji}', this)">
+                <div class="emoji-desc-header">
+                    <div class="emoji-large">${item.emoji}</div>
+                    <div class="emoji-info">
+                        <div class="emoji-name">${item.name}</div>
+                        <div class="emoji-description">${item.description}</div>
+                        <div class="emoji-usage">${item.usage}</div>
+                    </div>
+                </div>
+                <div class="emoji-tags">
+                    ${item.tags.map(tag => `<span class="emoji-tag">${tag}</span>`).join('')}
+                </div>
+                <div class="copy-indicator">복사됨!</div>
+            </div>
+        `).join('');
+    }
+}
+
+// 이모지 복사 함수
+function copyEmojiFromDesc(emoji, element) {
+    // 터치 피드백
+    if (navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+    
+    navigator.clipboard.writeText(emoji).then(() => {
+        // 복사 표시
+        element.classList.add('copied');
+        setTimeout(() => {
+            element.classList.remove('copied');
+        }, 1000);
+        
+        // 플로팅 박스에 추가
+        addToCollectorFromDesc(emoji);
+        
+        // 알림 표시
+        showCopyNotificationFromDesc(emoji);
+    }).catch(() => {
+        // 대체 복사 방법
+        fallbackCopyTextToClipboard(emoji);
+        element.classList.add('copied');
+        setTimeout(() => {
+            element.classList.remove('copied');
+        }, 1000);
+        addToCollectorFromDesc(emoji);
+        showCopyNotificationFromDesc(emoji);
+    });
+}
+
+function addToCollectorFromDesc(emoji) {
+    const collector = document.getElementById('emojiCollector');
+    if (!collector) return;
+    
+    if (collector.hasAttribute('data-placeholder')) {
+        collector.textContent = emoji;
+        collector.removeAttribute('data-placeholder');
+    } else {
+        collector.textContent += emoji;
+    }
+}
+
+function showCopyNotificationFromDesc(copiedEmoji) {
+    const notification = document.getElementById('copyNotification');
+    if (!notification) return;
+    
+    notification.textContent = `이모지가 복사되었습니다! ${copiedEmoji}`;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 2000);
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+    } catch (err) {
+        console.error('복사 실패', err);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// 전역 변수로 매니저 인스턴스 저장
+let descriptionManager;
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded - 초기화 시작');
+    descriptionManager = new DescriptionManager();
+});
+
+// 즉시 초기화 (이미 DOM이 로드된 경우)
+if (document.readyState !== 'loading') {
+    console.log('DOM 이미 로드됨 - 즉시 초기화');
+    descriptionManager = new DescriptionManager();
+}
+
+// 전역 랜덤 함수 (백업용)
+function handleRandomClickGlobal() {
+    console.log('전역 랜덤 함수 호출됨');
+    if (descriptionManager) {
+        descriptionManager.handleRandomClick();
+    } else {
+        console.error('DescriptionManager가 초기화되지 않음');
+    }
+}
+</script>
