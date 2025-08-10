@@ -289,6 +289,15 @@
     font-size: 14px;
     color: #666;
     font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.random-copy-hint {
+    font-size: 12px;
+    color: #999;
+    font-weight: 400;
+    opacity: 0.8;
 }
 
 .random-info {
@@ -553,14 +562,20 @@ class DescriptionManager {
         const container = document.getElementById('emojiDescriptions');
         if (!container) return;
 
+        // 이모지 키워드 설명 가져오기
+        const keywords = this.getEmojiDescription(emoji);
+        const descriptionText = keywords.length > 0 ? keywords.slice(0, 3).join(' · ') : '재미있는 이모지입니다!';
+        const mainKeyword = keywords.length > 0 ? keywords[0] : '이모지';
+
         // 랜덤 이모지 전용 카드 렌더링 (300px 정사각형, 80px 이모지)
         container.innerHTML = `
             <div class="random-emoji-container">
                 <div class="random-emoji-box" onclick="copyEmojiFromDesc('${emoji}', this)">
                     <div class="random-emoji-display">${emoji}</div>
                     <div class="random-emoji-text">
-                        <div class="random-title">🎲 랜덤 이모지</div>
-                        <div class="random-subtitle">클릭해서 복사하세요!</div>
+                        <div class="random-title">🎲 ${mainKeyword}</div>
+                        <div class="random-subtitle">${descriptionText}</div>
+                        <div class="random-copy-hint">클릭해서 복사하세요!</div>
                     </div>
                     <div class="copy-indicator">복사됨!</div>
                 </div>
@@ -570,6 +585,14 @@ class DescriptionManager {
                 </div>
             </div>
         `;
+    }
+
+    getEmojiDescription(emoji) {
+        // emojiKeywords에서 해당 이모지의 키워드 설명 가져오기
+        if (window.emojiKeywords && window.emojiKeywords[emoji]) {
+            return window.emojiKeywords[emoji];
+        }
+        return [];
     }
 
     getEmojiCount() {
