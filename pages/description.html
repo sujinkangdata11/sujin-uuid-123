@@ -524,11 +524,6 @@ class DescriptionManager {
         
         // 랜덤 이모지 표시 (설명 없는 형태)
         this.renderRandomEmoji(randomEmoji);
-        
-        // 랜덤 이모지 알림
-        setTimeout(() => {
-            showCopyNotificationFromDesc(`🎲 랜덤 이모지: ${randomEmoji}!`);
-        }, 300);
     }
 
     getRandomEmojiFromData() {
@@ -615,8 +610,8 @@ class DescriptionManager {
     }
 }
 
-// 이모지 복사 함수
-function copyEmojiFromDesc(emoji, element) {
+// 이모지 복사 함수 (전역으로 노출)
+window.copyEmojiFromDesc = function(emoji, element) {
     // 터치 피드백
     if (navigator.vibrate) {
         navigator.vibrate(50);
@@ -644,9 +639,9 @@ function copyEmojiFromDesc(emoji, element) {
         addToCollectorFromDesc(emoji);
         showCopyNotificationFromDesc(emoji);
     });
-}
+};
 
-function addToCollectorFromDesc(emoji) {
+window.addToCollectorFromDesc = function(emoji) {
     const collector = document.getElementById('emojiCollector');
     if (!collector) return;
     
@@ -656,21 +651,27 @@ function addToCollectorFromDesc(emoji) {
     } else {
         collector.textContent += emoji;
     }
-}
+};
 
-function showCopyNotificationFromDesc(copiedEmoji) {
+window.showCopyNotificationFromDesc = function(copiedEmoji) {
     const notification = document.getElementById('copyNotification');
-    if (!notification) return;
+    console.log('알림 요소 찾기:', notification); // 디버깅
+    
+    if (!notification) {
+        console.error('copyNotification 요소를 찾을 수 없습니다!');
+        return;
+    }
     
     notification.textContent = `이모지가 복사되었습니다! ${copiedEmoji}`;
     notification.classList.add('show');
+    console.log('알림 표시됨:', copiedEmoji); // 디버깅
     
     setTimeout(() => {
         notification.classList.remove('show');
     }, 2000);
-}
+};
 
-function fallbackCopyTextToClipboard(text) {
+window.fallbackCopyTextToClipboard = function(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
     textArea.style.top = "0";
@@ -687,7 +688,7 @@ function fallbackCopyTextToClipboard(text) {
     }
     
     document.body.removeChild(textArea);
-}
+};
 
 // 전역 변수로 매니저 인스턴스 저장
 if (typeof window.descriptionManager === 'undefined') {
@@ -712,12 +713,12 @@ function initializeDescriptionPage() {
 initializeDescriptionPage();
 
 // 전역 랜덤 함수 (백업용)
-function handleRandomClickGlobal() {
+window.handleRandomClickGlobal = function() {
     console.log('전역 랜덤 함수 호출됨');
     if (window.descriptionManager) {
         window.descriptionManager.handleRandomClick();
     } else {
         console.error('DescriptionManager가 초기화되지 않음');
     }
-}
+};
 </script>
