@@ -238,6 +238,12 @@ class EmojiManager {
                 score += 25;
             }
             
+            // 직관적 검색 보너스 점수 시스템
+            if (matched) {
+                const intuitiveBonuses = this.getIntuitiveBonus(searchTerm, emoji);
+                score += intuitiveBonuses;
+            }
+            
             if (matched) {
                 scoredResults.push({ emoji, score, matchTypes });
             }
@@ -438,6 +444,83 @@ class EmojiManager {
         
         collector.textContent = '이모지를 클릭하세요';
         collector.setAttribute('data-placeholder', 'true');
+    }
+
+    getIntuitiveBonus(searchTerm, emoji) {
+        let bonus = 0;
+        
+        // 직관적 검색 매핑: 특정 키워드에 대해 가장 직관적인 이모지에 높은 보너스 점수
+        const intuitiveMap = {
+            '하트': {
+                '❤️': 200,    // 빨간 하트 - 가장 기본적인 하트
+                '♥️': 180,    // 클래식 하트  
+                '💕': 120,    // 두개 하트
+                '💖': 100,    // 반짝 하트
+                '💗': 90,     // 커지는 하트
+                '💘': 80,     // 화살 하트
+                '💞': 70,     // 회전 하트
+                '💝': 60,     // 선물 하트
+                '💟': 50,     // 하트 장식
+                '💛': 40,     // 노란 하트
+                '💚': 40,     // 초록 하트
+                '💙': 40,     // 파란 하트
+                '💜': 40,     // 보라 하트
+                '🧡': 40,     // 주황 하트
+                '🤎': 40,     // 갈색 하트
+                '🖤': 40,     // 검은 하트
+                '🤍': 40,     // 흰 하트
+                '❣️': 35      // 하트 느낌표
+            },
+            '사랑': {
+                '❤️': 200,    // 빨간 하트
+                '♥️': 180,    // 클래식 하트
+                '💕': 150,    // 두개 하트
+                '💖': 140,    // 반짝 하트
+                '💞': 130,    // 회전 하트
+                '💘': 120,    // 화살 하트 (큐피드)
+                '💗': 110,    // 커지는 하트
+                '💝': 100,    // 선물 하트
+                '💟': 90,     // 하트 장식
+                '💑': 80,     // 커플
+                '💏': 70,     // 키스하는 커플
+                '💋': 60,     // 키스마크
+                '🌹': 50,     // 장미
+                '💌': 40      // 러브레터
+            },
+            '웃음': {
+                '😀': 200,    // 활짝 웃는 얼굴
+                '😁': 180,    // 이빨 보이는 웃음
+                '😂': 170,    // 기쁨의 눈물
+                '🤣': 160,    // 바닥 굴러가며 웃기
+                '😄': 150,    // 눈웃음
+                '😃': 140,    // 웃는 얼굴
+                '😆': 130,    // 웃음 참기
+                '😊': 120     // 부끄러운 웃음
+            },
+            '슬픔': {
+                '😢': 200,    // 눈물
+                '😭': 180,    // 크게 우는 얼굴
+                '😞': 160,    // 실망한 얼굴
+                '😔': 150,    // 침울한 얼굴
+                '☹️': 140,    // 찌푸린 얼굴
+                '😿': 130,    // 우는 고양이
+                '💔': 120     // 상처받은 하트
+            }
+        };
+        
+        // Love 카테고리 이모지에 대한 추가 보너스
+        if (window.emojiData && window.emojiData.love && window.emojiData.love.includes(emoji)) {
+            if (searchTerm === '하트' || searchTerm === '사랑') {
+                bonus += 50; // Love 카테고리 보너스
+            }
+        }
+        
+        // 직관적 매핑에서 보너스 점수 적용
+        if (intuitiveMap[searchTerm] && intuitiveMap[searchTerm][emoji]) {
+            bonus += intuitiveMap[searchTerm][emoji];
+        }
+        
+        return bonus;
     }
 }
 
