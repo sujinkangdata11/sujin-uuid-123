@@ -183,6 +183,49 @@ class EmojiManager {
             
             // 검색 분석 로깅 (디버깅용)
             console.log(`검색어: "${searchTerm}", 결과: ${searchResults.length}개`);
+            
+            // 하트 검색 디버깅
+            if (searchTerm === '하트') {
+                console.log('=== 하트 검색 결과 상위 5개 ===');
+                const scoredResults = this.performSearch(searchTerm, emojiKeywords);
+                const testResults = [];
+                const searchPool = this.currentCategory === 'all' ? this.allEmojis : (window.emojiData[this.currentCategory] || []);
+                
+                for (const emoji of searchPool) {
+                    const keywords = emojiKeywords[emoji] || [];
+                    let score = 0;
+                    let matched = false;
+                    
+                    for (let i = 0; i < keywords.length; i++) {
+                        const keyword = keywords[i].toLowerCase();
+                        if (keyword === searchTerm) {
+                            score += 150;
+                            matched = true;
+                            if (i === 0) score += 30;
+                        } else if (keyword.startsWith(searchTerm)) {
+                            score += 100;
+                            matched = true;
+                            if (i === 0) score += 30;
+                        } else if (keyword.includes(searchTerm)) {
+                            score += 60;
+                            matched = true;
+                            if (i === 0) score += 30;
+                        }
+                    }
+                    
+                    if (matched) {
+                        const intuitiveBonuses = this.getIntuitiveBonus(searchTerm, emoji);
+                        score += intuitiveBonuses;
+                        testResults.push({ emoji, score, keywords });
+                    }
+                }
+                
+                testResults.sort((a, b) => b.score - a.score);
+                testResults.slice(0, 5).forEach((result, index) => {
+                    console.log(`${index + 1}. ${result.emoji} - ${result.score}점 - 키워드: [${result.keywords.join(', ')}]`);
+                });
+                console.log('==========================');
+            }
         }, 150); // 150ms 디바운싱
     }
     
