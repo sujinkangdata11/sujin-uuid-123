@@ -1,0 +1,18 @@
+{
+    "sourceFile": "pages/special.html",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1754973127719,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1754973127719,
+            "name": "Commit-0",
+            "content": "<div class=\"content-page\">\n    <h2>특수문자</h2>\n    <div class=\"special-content\">\n        <p>다양한 특수문자와 기호를 찾고 복사할 수 있습니다.</p>\n        <div class=\"special-character-grid\">\n            <!-- 특수문자 목록이 여기에 추가됩니다 -->\n        </div>\n    </div>\n</div>\n\n<!-- 하단 광고 -->\n<div class=\"bottom-ad\">\n    광고 영역 - 하단 배너\n</div>\n\n<style>\n.content-page {\n    padding: 20px 0;\n}\n\n.content-page h2 {\n    font-size: 24px;\n    color: #333;\n    margin-bottom: 20px;\n    text-align: center;\n}\n\n.special-content {\n    text-align: center;\n    color: #666;\n    font-size: 16px;\n    line-height: 1.6;\n}\n\n.special-character-grid {\n    margin-top: 30px;\n    min-height: 300px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    background: #f8f9fa;\n    border-radius: 8px;\n    color: #999;\n}\n\n@media (max-width: 768px) {\n    .content-page h2 {\n        font-size: 20px;\n    }\n    \n    .special-content {\n        font-size: 14px;\n    }\n}\n</style>"
+        }
+    ]
+}

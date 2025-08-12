@@ -1,0 +1,18 @@
+{
+    "sourceFile": "js/main.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1754973127720,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1754973127720,
+            "name": "Commit-0",
+            "content": "// 메인 애플리케이션 JavaScript\n\nclass App {\n    constructor() {\n        this.navigation = null;\n        this.emojiManager = null;\n    }\n\n    init() {\n        // DOM이 로드되면 앱 초기화\n        if (document.readyState === 'loading') {\n            document.addEventListener('DOMContentLoaded', () => {\n                this.initializeApp();\n            });\n        } else {\n            this.initializeApp();\n        }\n    }\n\n    async initializeApp() {\n        try {\n            // 네비게이션 초기화\n            if (window.Navigation) {\n                this.navigation = new window.Navigation();\n            }\n\n            // 기본 페이지(이모지) 로드\n            await this.loadDefaultPage();\n\n            console.log('앱이 성공적으로 초기화되었습니다.');\n        } catch (error) {\n            console.error('앱 초기화 중 오류 발생:', error);\n        }\n    }\n\n    async loadDefaultPage() {\n        // 기본적으로 이모지 페이지를 로드\n        if (this.navigation) {\n            await this.navigation.loadPageContent('emoji');\n        }\n    }\n\n    // 다른 모듈에서 사용할 수 있는 유틸리티 메서드들\n    static async loadHTML(url) {\n        try {\n            const response = await fetch(url);\n            if (response.ok) {\n                return await response.text();\n            }\n            throw new Error(`HTTP ${response.status}: ${response.statusText}`);\n        } catch (error) {\n            console.error('HTML 로딩 실패:', error);\n            throw error;\n        }\n    }\n\n    static showError(message) {\n        console.error(message);\n        // TODO: 사용자에게 에러 메시지를 보여주는 UI 구현\n    }\n\n    static showLoading(show = true) {\n        // TODO: 로딩 스피너 표시/숨기기 구현\n        console.log(show ? '로딩 시작' : '로딩 완료');\n    }\n}\n\n// 앱 초기화\nconst app = new App();\napp.init();\n\n// 전역에서 사용할 수 있도록 노출\nwindow.App = app;"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "pages/news.html",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1754973127720,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1754973127720,
+            "name": "Commit-0",
+            "content": "<div class=\"content-page\">\n    <h2>뉴스</h2>\n    <div class=\"news-content\">\n        <p>최신 이모지 업데이트와 관련 뉴스를 확인할 수 있습니다.</p>\n        <div class=\"news-list\">\n            <!-- 뉴스 목록이 여기에 추가됩니다 -->\n        </div>\n    </div>\n</div>\n\n<!-- 하단 광고 -->\n<div class=\"bottom-ad\">\n    광고 영역 - 하단 배너\n</div>\n\n<style>\n.content-page {\n    padding: 20px 0;\n}\n\n.content-page h2 {\n    font-size: 24px;\n    color: #333;\n    margin-bottom: 20px;\n    text-align: center;\n}\n\n.news-content {\n    text-align: center;\n    color: #666;\n    font-size: 16px;\n    line-height: 1.6;\n}\n\n.news-list {\n    margin-top: 30px;\n    min-height: 300px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    background: #f8f9fa;\n    border-radius: 8px;\n    color: #999;\n}\n\n@media (max-width: 768px) {\n    .content-page h2 {\n        font-size: 20px;\n    }\n    \n    .news-content {\n        font-size: 14px;\n    }\n}\n</style>"
+        }
+    ]
+}
