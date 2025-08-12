@@ -211,6 +211,10 @@
         padding: 15px;
     }
     
+    .emoji-detailed-description {
+        font-size: 14px;
+    }
+    
     .emoji-info-box p {
         font-size: 14px;
     }
@@ -335,6 +339,10 @@
     .emoji-info-box {
         max-width: 300px;
         padding: 12px;
+    }
+    
+    .emoji-detailed-description {
+        font-size: 13px;
     }
     
     .emoji-info-box p {
@@ -520,6 +528,15 @@
 .emoji-info-header strong {
     font-size: 22px;
     font-weight: 700;
+    color: #333;
+}
+
+.emoji-detailed-description {
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 15px;
+    line-height: 1.6;
     color: #333;
 }
 
@@ -944,6 +961,9 @@ class DescriptionManager {
                         <div class="emoji-info-header">
                             <strong>${emoji} ${mainKeyword} 이모지 의미·복사</strong>
                         </div>
+                        <div class="emoji-detailed-description">
+                            ${this.getEmojiDetailedDescription(emoji, mainKeyword)}
+                        </div>
                         ${finalInfoText.join('')}
                     </div>
                 ` : ''}
@@ -1085,6 +1105,15 @@ class DescriptionManager {
             return window.emojiKeywords[emoji];
         }
         return [];
+    }
+
+    getEmojiDetailedDescription(emoji, name) {
+        // 각 이모지별 상세한 시각적/물리적 설명
+        const descriptions = {
+            '🦈': '상어, 많은 이빨을 가진 크고 은밀한 물고기. 일반적으로 백상아리나 호랑이상어로 묘사되며, 왼쪽을 향한 전체 프로필의 회색 상어로 나타납니다. 하얀 아랫면과 세 개의 아가미, 뾰족한 코와 이빨이 늘어선 입이 날카로운 등지느러미와 길고 뾰족한 꼬리로 이어집니다.'
+        };
+        
+        return descriptions[emoji] || `${name}를 시각적으로 표현한 이모지입니다.`;
     }
 
     getEmojiCount() {
