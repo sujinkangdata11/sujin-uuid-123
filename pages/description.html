@@ -192,7 +192,7 @@
     
     /* 검색 구분선 모바일 스타일 */
     .search-divider {
-        font-size: 14px;
+        font-size: 16px;
         margin: 25px 0 15px 0;
     }
     
@@ -373,8 +373,9 @@
 /* 검색 결과 구분선 스타일 */
 .search-divider {
     text-align: center;
-    font-size: 16px;
-    color: #666;
+    font-size: 18px;
+    color: #333;
+    font-weight: normal;
     margin: 30px 0 20px 0;
     position: relative;
     padding: 0 20px;
@@ -396,6 +397,7 @@
     padding: 0 15px;
     position: relative;
     z-index: 2;
+    font-weight: normal;
 }
 
 /* 검색 결과 그리드 컨테이너 스타일 - 3개씩 가로 나열 */
@@ -780,9 +782,33 @@ class DescriptionManager {
 
     getAllDescriptions() {
         const all = [];
-        for (const category in emojiDescriptionData) {
-            all.push(...emojiDescriptionData[category].map(item => ({...item, category})));
+        
+        // emoji-data.js가 로드된 경우 실제 이모지 데이터 사용
+        if (window.emojiData && window.emojiKeywords) {
+            for (const [categoryKey, emojis] of Object.entries(window.emojiData)) {
+                emojis.forEach(emoji => {
+                    const keywords = window.emojiKeywords[emoji] || [];
+                    const name = keywords[0] || '이모지';
+                    const description = keywords.length > 1 ? keywords.slice(1, 3).join(' · ') : `${name}를 나타내는 이모지입니다.`;
+                    const usage = `${name} 관련 상황에서 사용`;
+                    
+                    all.push({
+                        emoji: emoji,
+                        name: name,
+                        description: description,
+                        usage: usage,
+                        tags: keywords,
+                        category: categoryKey
+                    });
+                });
+            }
+        } else {
+            // 백업용 기본 데이터
+            for (const category in emojiDescriptionData) {
+                all.push(...emojiDescriptionData[category].map(item => ({...item, category})));
+            }
         }
+        
         return all;
     }
 
