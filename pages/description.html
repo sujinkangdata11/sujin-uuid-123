@@ -957,6 +957,65 @@ class DescriptionManager {
             if (filtered.length > 0) {
                 console.log('상위 결과:', filtered.slice(0, 5).map(item => `${item.emoji} ${item.name}`));
             }
+            
+            // 검은색 고양이 특별 디버깅 (설명탭)
+            if (searchTerm === '검은색 고양이') {
+                console.log('=== 검은색 고양이 특별 디버깅 (설명탭) ===');
+                const searchTermsDebug = searchTerm.split(/\s+/);
+                console.log('분리된 검색어:', searchTermsDebug);
+                
+                // 검은 고양이 이모지 찾기
+                const blackCatItems = this.allDescriptions.filter(item => 
+                    item.emoji === '🐈‍⬛' || 
+                    item.name.includes('검은') || 
+                    item.description.includes('검은')
+                );
+                console.log('검은 고양이 관련 아이템들:', blackCatItems);
+                
+                // 정확한 검은 고양이 이모지 찾기
+                const exactBlackCat = this.allDescriptions.find(item => item.emoji === '🐈‍⬛');
+                console.log('정확한 검은 고양이 이모지:', exactBlackCat);
+                
+                // 모든 고양이 이모지 찾기
+                const catItems = this.allDescriptions.filter(item => 
+                    item.emoji.includes('🐈') || 
+                    item.name.includes('고양이') ||
+                    (window.emojiKeywords[item.emoji] && window.emojiKeywords[item.emoji].some(kw => kw.includes('고양이')))
+                );
+                console.log('모든 고양이 관련 이모지:', catItems);
+                
+                if (blackCatItems.length > 0) {
+                    const testItem = blackCatItems[0];
+                    console.log('테스트 아이템:', testItem);
+                    const keywords = window.emojiKeywords[testItem.emoji] || [];
+                    console.log('키워드:', keywords);
+                    
+                    searchTermsDebug.forEach(term => {
+                        console.log(`\n검색어 "${term}" 테스트:`);
+                        let termMatched = false;
+                        
+                        // 이름 검색
+                        if (testItem.name.toLowerCase().includes(term)) {
+                            console.log(`  이름 매칭: "${testItem.name}" 포함 "${term}"`);
+                            termMatched = true;
+                        }
+                        
+                        // 키워드 검색
+                        keywords.forEach(keyword => {
+                            const kw = keyword.toLowerCase();
+                            if (kw === term || kw.startsWith(term) || kw.includes(term) || 
+                                (term.includes(kw) && kw.length >= 2) || 
+                                (kw.includes(term) && term.length >= 2)) {
+                                console.log(`  키워드 매칭: "${keyword}" <-> "${term}"`);
+                                termMatched = true;
+                            }
+                        });
+                        
+                        console.log(`  "${term}" 매칭 결과: ${termMatched}`);
+                    });
+                }
+            }
+            
             console.log('==========================');
         }
     }
