@@ -837,62 +837,85 @@ class DescriptionManager {
             return;
         }
 
-        // 이모지 탭의 고급 검색 로직 적용
+        // 복합 검색어 처리: 띄어쓰기로 분리하여 개별 단어로 검색
+        const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
         const emojiKeywords = window.emojiKeywords || {};
         const scoredResults = [];
         
         for (const item of this.allDescriptions) {
             let score = 0;
             let matched = false;
+            let matchedTerms = 0;
             
-            // 1. 이모지 이름에서 검색
-            if (item.name.toLowerCase().includes(searchTerm)) {
-                if (item.name.toLowerCase() === searchTerm) {
-                    score += 200; // 완전일치
-                } else if (item.name.toLowerCase().startsWith(searchTerm)) {
-                    score += 150; // 시작일치
-                } else {
-                    score += 100; // 포함
-                }
-                matched = true;
-            }
-            
-            // 2. 이모지 키워드에서 검색 (emoji.js와 동일한 로직)
-            const keywords = emojiKeywords[item.emoji] || [];
-            for (let i = 0; i < keywords.length; i++) {
-                const keyword = keywords[i].toLowerCase();
+            // 각 검색어에 대해 검사
+            for (const currentSearchTerm of searchTerms) {
+                let termMatched = false;
+                let termScore = 0;
                 
-                if (keyword === searchTerm) {
-                    score += 150;
-                    matched = true;
-                    if (i === 0) score += 30; // 첫 번째 키워드 보너스
-                } else if (keyword.startsWith(searchTerm)) {
-                    score += 100;
-                    matched = true;
-                    if (i === 0) score += 30;
-                } else if (keyword.includes(searchTerm)) {
-                    score += 60;
-                    matched = true;
-                    if (i === 0) score += 30;
+                // 1. 이모지 이름에서 검색
+                if (item.name.toLowerCase().includes(currentSearchTerm)) {
+                    if (item.name.toLowerCase() === currentSearchTerm) {
+                        termScore += 200; // 완전일치
+                    } else if (item.name.toLowerCase().startsWith(currentSearchTerm)) {
+                        termScore += 150; // 시작일치
+                    } else {
+                        termScore += 100; // 포함
+                    }
+                    termMatched = true;
+                }
+                
+                // 2. 이모지 키워드에서 검색 (emoji.js와 동일한 로직)
+                const keywords = emojiKeywords[item.emoji] || [];
+                for (let i = 0; i < keywords.length; i++) {
+                    const keyword = keywords[i].toLowerCase();
+                    
+                    if (keyword === currentSearchTerm) {
+                        termScore += 150;
+                        termMatched = true;
+                        if (i === 0) termScore += 30; // 첫 번째 키워드 보너스
+                    } else if (keyword.startsWith(currentSearchTerm)) {
+                        termScore += 100;
+                        termMatched = true;
+                        if (i === 0) termScore += 30;
+                    } else if (keyword.includes(currentSearchTerm)) {
+                        termScore += 60;
+                        termMatched = true;
+                        if (i === 0) termScore += 30;
+                    }
+                }
+                
+                // 3. 설명 텍스트에서 검색
+                if (item.description.toLowerCase().includes(currentSearchTerm)) {
+                    termScore += 50; // 설명 매칭은 낮은 점수
+                    termMatched = true;
+                }
+                
+                // 4. 태그에서 검색
+                for (const tag of item.tags) {
+                    if (tag.toLowerCase().includes(currentSearchTerm)) {
+                        termScore += 30;
+                        termMatched = true;
+                    }
+                }
+                
+                if (termMatched) {
+                    matchedTerms++;
+                    score += termScore;
                 }
             }
             
-            // 3. 설명 텍스트에서 검색
-            if (item.description.toLowerCase().includes(searchTerm)) {
-                score += 50; // 설명 매칭은 낮은 점수
+            // 모든 검색어가 매칭되어야 결과에 포함
+            if (matchedTerms === searchTerms.length) {
                 matched = true;
-            }
-            
-            // 4. 태그에서 검색
-            for (const tag of item.tags) {
-                if (tag.toLowerCase().includes(searchTerm)) {
-                    score += 30;
-                    matched = true;
+                
+                // 복합 검색어 보너스: 여러 단어가 모두 매칭되면 추가 점수
+                if (searchTerms.length > 1) {
+                    score += 100 * searchTerms.length;
                 }
             }
             
             // 5. 특별 규칙: "하트"와 "사랑" 검색 시 하트 이모지들에게 최고 우선순위 보장
-            if (matched && (searchTerm === '하트' || searchTerm === '사랑')) {
+            if (matched && (searchTerm === '하트' || searchTerm === '사랑' || searchTerms.includes('하트') || searchTerms.includes('사랑'))) {
                 if (item.emoji === '❤️') {
                     score += 10000000; // 절대적 우선순위
                 } else if (item.emoji === '♥️') {
@@ -916,6 +939,16 @@ class DescriptionManager {
         const filtered = scoredResults.map(result => result.item);
         
         this.renderDescriptions(filtered, searchTerm);
+        
+        // 복합 검색 디버깅
+        if (searchTerm.includes(' ')) {
+            console.log(`=== 복합 검색 (설명탭): "${searchTerm}" ===`);
+            console.log(`검색 결과: ${filtered.length}개`);
+            if (filtered.length > 0) {
+                console.log('상위 결과:', filtered.slice(0, 5).map(item => `${item.emoji} ${item.name}`));
+            }
+            console.log('==========================');
+        }
     }
 
     handleRandomClick() {

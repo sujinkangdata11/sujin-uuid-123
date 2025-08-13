@@ -184,98 +184,13 @@ class EmojiManager {
             // 검색 분석 로깅 (디버깅용)
             console.log(`검색어: "${searchTerm}", 결과: ${searchResults.length}개`);
             
-            // 사랑 검색 디버깅  
-            if (searchTerm === '사랑') {
-                console.log('=== 사랑 검색 결과 상위 10개 ===');
-                const testResults = [];
-                const searchPool = this.currentCategory === 'all' ? this.allEmojis : (window.emojiData[this.currentCategory] || []);
-                
-                for (const emoji of searchPool) {
-                    const keywords = emojiKeywords[emoji] || [];
-                    let score = 0;
-                    let matched = false;
-                    let baseScore = 0;
-                    
-                    for (let i = 0; i < keywords.length; i++) {
-                        const keyword = keywords[i].toLowerCase();
-                        if (keyword === searchTerm) {
-                            baseScore += 150;
-                            matched = true;
-                            if (i === 0) baseScore += 30;
-                        } else if (keyword.startsWith(searchTerm)) {
-                            baseScore += 100;
-                            matched = true;
-                            if (i === 0) baseScore += 30;
-                        } else if (keyword.includes(searchTerm)) {
-                            baseScore += 60;
-                            matched = true;
-                            if (i === 0) baseScore += 30;
-                        }
-                    }
-                    
-                    if (matched) {
-                        score = baseScore;
-                        const intuitiveBonuses = this.getIntuitiveBonus(searchTerm, emoji);
-                        score += intuitiveBonuses;
-                        
-                        // 특별 보너스 적용
-                        if (emoji === '❤️') score += 10000000;
-                        else if (emoji === '♥️') score += 5000000;
-                        else if (emoji === '💑') score += 1000000;
-                        else if (emoji === '💕') score += 800000;
-                        else if (emoji === '💖') score += 700000;
-                        
-                        testResults.push({ emoji, score, keywords, baseScore });
-                    }
+            // 복합 검색 디버깅
+            if (searchTerm.includes(' ')) {
+                console.log(`=== 복합 검색: "${searchTerm}" ===`);
+                console.log(`검색 결과: ${searchResults.length}개`);
+                if (searchResults.length > 0) {
+                    console.log('상위 결과:', searchResults.slice(0, 5));
                 }
-                
-                testResults.sort((a, b) => b.score - a.score);
-                testResults.slice(0, 10).forEach((result, index) => {
-                    console.log(`${index + 1}. ${result.emoji} - 총${result.score}점 (기본:${result.baseScore}) - [${result.keywords.join(', ')}]`);
-                });
-                console.log('==========================');
-            }
-            
-            // 하트 검색 디버깅
-            if (searchTerm === '하트') {
-                console.log('=== 하트 검색 결과 상위 5개 ===');
-                const scoredResults = this.performSearch(searchTerm, emojiKeywords);
-                const testResults = [];
-                const searchPool = this.currentCategory === 'all' ? this.allEmojis : (window.emojiData[this.currentCategory] || []);
-                
-                for (const emoji of searchPool) {
-                    const keywords = emojiKeywords[emoji] || [];
-                    let score = 0;
-                    let matched = false;
-                    
-                    for (let i = 0; i < keywords.length; i++) {
-                        const keyword = keywords[i].toLowerCase();
-                        if (keyword === searchTerm) {
-                            score += 150;
-                            matched = true;
-                            if (i === 0) score += 30;
-                        } else if (keyword.startsWith(searchTerm)) {
-                            score += 100;
-                            matched = true;
-                            if (i === 0) score += 30;
-                        } else if (keyword.includes(searchTerm)) {
-                            score += 60;
-                            matched = true;
-                            if (i === 0) score += 30;
-                        }
-                    }
-                    
-                    if (matched) {
-                        const intuitiveBonuses = this.getIntuitiveBonus(searchTerm, emoji);
-                        score += intuitiveBonuses;
-                        testResults.push({ emoji, score, keywords });
-                    }
-                }
-                
-                testResults.sort((a, b) => b.score - a.score);
-                testResults.slice(0, 5).forEach((result, index) => {
-                    console.log(`${index + 1}. ${result.emoji} - ${result.score}점 - 키워드: [${result.keywords.join(', ')}]`);
-                });
                 console.log('==========================');
             }
         }, 150); // 150ms 디바운싱
@@ -283,6 +198,9 @@ class EmojiManager {
     
     performSearch(searchTerm, emojiKeywords) {
         const scoredResults = [];
+        
+        // 복합 검색어 처리: 띄어쓰기로 분리하여 개별 단어로 검색
+        const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
         
         // 성능 최적화: 검색 대상을 현재 카테고리로 제한 (필요시)
         const searchPool = this.currentCategory === 'all' ? 
@@ -294,37 +212,59 @@ class EmojiManager {
             let score = 0;
             let matched = false;
             let matchTypes = new Set(); // 매칭 타입을 추적
+            let matchedTerms = 0; // 매칭된 검색어 개수
             
-            for (let i = 0; i < keywords.length; i++) {
-                const keyword = keywords[i].toLowerCase();
+            // 각 검색어에 대해 검사
+            for (const currentSearchTerm of searchTerms) {
+                let termMatched = false;
+                let termScore = 0;
                 
-                // 완전 일치 (최고 점수)
-                if (keyword === searchTerm) {
-                    score += 150;
-                    matched = true;
-                    matchTypes.add('exact');
-                } 
-                // 시작 부분 일치 (높은 점수)
-                else if (keyword.startsWith(searchTerm)) {
-                    score += 100;
-                    matched = true;
-                    matchTypes.add('start');
-                }
-                // 포함 (보통 점수)
-                else if (keyword.includes(searchTerm)) {
-                    score += 60;
-                    matched = true;
-                    matchTypes.add('contain');
+                for (let i = 0; i < keywords.length; i++) {
+                    const keyword = keywords[i].toLowerCase();
+                    
+                    // 완전 일치 (최고 점수)
+                    if (keyword === currentSearchTerm) {
+                        termScore += 150;
+                        termMatched = true;
+                        matchTypes.add('exact');
+                    } 
+                    // 시작 부분 일치 (높은 점수)
+                    else if (keyword.startsWith(currentSearchTerm)) {
+                        termScore += 100;
+                        termMatched = true;
+                        matchTypes.add('start');
+                    }
+                    // 포함 (보통 점수)
+                    else if (keyword.includes(currentSearchTerm)) {
+                        termScore += 60;
+                        termMatched = true;
+                        matchTypes.add('contain');
+                    }
+                    
+                    // 첫 번째 키워드 매칭 시 보너스 점수
+                    if (i === 0 && (keyword === currentSearchTerm || keyword.startsWith(currentSearchTerm) || keyword.includes(currentSearchTerm))) {
+                        termScore += 30;
+                    }
+                    
+                    // 키워드 길이가 검색어와 비슷하면 보너스
+                    if (termMatched && Math.abs(keyword.length - currentSearchTerm.length) <= 2) {
+                        termScore += 20;
+                    }
                 }
                 
-                // 첫 번째 키워드 매칭 시 보너스 점수
-                if (i === 0 && matched) {
-                    score += 30;
+                if (termMatched) {
+                    matchedTerms++;
+                    score += termScore;
                 }
+            }
+            
+            // 모든 검색어가 매칭되어야 결과에 포함
+            if (matchedTerms === searchTerms.length) {
+                matched = true;
                 
-                // 키워드 길이가 검색어와 비슷하면 보너스
-                if (matched && Math.abs(keyword.length - searchTerm.length) <= 2) {
-                    score += 20;
+                // 복합 검색어 보너스: 여러 단어가 모두 매칭되면 추가 점수
+                if (searchTerms.length > 1) {
+                    score += 100 * searchTerms.length;
                 }
             }
             
