@@ -881,9 +881,14 @@ class DescriptionManager {
                         termScore += 60;
                         termMatched = true;
                         if (i === 0) termScore += 30;
-                    } else if (currentSearchTerm.includes(keyword)) {
+                    } else if (currentSearchTerm.includes(keyword) && keyword.length >= 2) {
                         // 역방향 포함 매칭: 검색어가 키워드를 포함하는 경우
                         termScore += 40;
+                        termMatched = true;
+                        if (i === 0) termScore += 30;
+                    } else if (keyword.includes(currentSearchTerm) && currentSearchTerm.length >= 2) {
+                        // 키워드가 검색어를 포함하는 경우 (예: "검은고양이"가 "고양이"를 포함)
+                        termScore += 35;
                         termMatched = true;
                         if (i === 0) termScore += 30;
                     }

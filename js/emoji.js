@@ -191,6 +191,31 @@ class EmojiManager {
                 if (searchResults.length > 0) {
                     console.log('상위 결과:', searchResults.slice(0, 5));
                 }
+                
+                // 검은색 고양이 특별 디버깅
+                if (searchTerm === '검은색 고양이') {
+                    console.log('=== 검은색 고양이 특별 디버깅 ===');
+                    const searchTermsDebug = searchTerm.split(/\s+/);
+                    console.log('분리된 검색어:', searchTermsDebug);
+                    
+                    const testEmoji = '🐈‍⬛';
+                    const testKeywords = window.emojiKeywords[testEmoji] || [];
+                    console.log(`${testEmoji} 키워드:`, testKeywords);
+                    
+                    searchTermsDebug.forEach((term, termIndex) => {
+                        console.log(`\n검색어 "${term}" 테스트:`);
+                        testKeywords.forEach((keyword, kwIndex) => {
+                            const kw = keyword.toLowerCase();
+                            console.log(`  키워드 "${keyword}": 
+                                완전일치: ${kw === term},
+                                시작일치: ${kw.startsWith(term)},
+                                포함: ${kw.includes(term)},
+                                역포함: ${term.includes(kw) && kw.length >= 2},
+                                키워드포함: ${kw.includes(term) && term.length >= 2}`);
+                        });
+                    });
+                }
+                
                 console.log('==========================');
             }
         }, 150); // 150ms 디바운싱
@@ -241,10 +266,16 @@ class EmojiManager {
                         matchTypes.add('contain');
                     }
                     // 역방향 포함 매칭: 검색어가 키워드를 포함하는 경우 (예: "검은색"이 "검은"을 포함)
-                    else if (currentSearchTerm.includes(keyword)) {
+                    else if (currentSearchTerm.includes(keyword) && keyword.length >= 2) {
                         termScore += 40;
                         termMatched = true;
                         matchTypes.add('reverse_contain');
+                    }
+                    // 키워드가 검색어를 포함하는 경우 (예: "검은고양이"가 "고양이"를 포함)
+                    else if (keyword.includes(currentSearchTerm) && currentSearchTerm.length >= 2) {
+                        termScore += 35;
+                        termMatched = true;
+                        matchTypes.add('keyword_contains');
                     }
                     
                     // 첫 번째 키워드 매칭 시 보너스 점수
