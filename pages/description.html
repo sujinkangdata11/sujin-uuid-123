@@ -830,19 +830,91 @@ class DescriptionManager {
     }
 
     handleSearch(searchTerm) {
-        if (!searchTerm.trim()) {
+        searchTerm = searchTerm.toLowerCase().trim();
+        
+        if (!searchTerm) {
             this.renderDescriptions(this.allDescriptions);
             return;
         }
 
-        const filtered = this.allDescriptions.filter(item => {
-            const searchLower = searchTerm.toLowerCase();
-            return item.name.toLowerCase().includes(searchLower) ||
-                   item.description.toLowerCase().includes(searchLower) ||
-                   item.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
-                   item.emoji.includes(searchTerm);
-        });
-
+        // 이모지 탭의 고급 검색 로직 적용
+        const emojiKeywords = window.emojiKeywords || {};
+        const scoredResults = [];
+        
+        for (const item of this.allDescriptions) {
+            let score = 0;
+            let matched = false;
+            
+            // 1. 이모지 이름에서 검색
+            if (item.name.toLowerCase().includes(searchTerm)) {
+                if (item.name.toLowerCase() === searchTerm) {
+                    score += 200; // 완전일치
+                } else if (item.name.toLowerCase().startsWith(searchTerm)) {
+                    score += 150; // 시작일치
+                } else {
+                    score += 100; // 포함
+                }
+                matched = true;
+            }
+            
+            // 2. 이모지 키워드에서 검색 (emoji.js와 동일한 로직)
+            const keywords = emojiKeywords[item.emoji] || [];
+            for (let i = 0; i < keywords.length; i++) {
+                const keyword = keywords[i].toLowerCase();
+                
+                if (keyword === searchTerm) {
+                    score += 150;
+                    matched = true;
+                    if (i === 0) score += 30; // 첫 번째 키워드 보너스
+                } else if (keyword.startsWith(searchTerm)) {
+                    score += 100;
+                    matched = true;
+                    if (i === 0) score += 30;
+                } else if (keyword.includes(searchTerm)) {
+                    score += 60;
+                    matched = true;
+                    if (i === 0) score += 30;
+                }
+            }
+            
+            // 3. 설명 텍스트에서 검색
+            if (item.description.toLowerCase().includes(searchTerm)) {
+                score += 50; // 설명 매칭은 낮은 점수
+                matched = true;
+            }
+            
+            // 4. 태그에서 검색
+            for (const tag of item.tags) {
+                if (tag.toLowerCase().includes(searchTerm)) {
+                    score += 30;
+                    matched = true;
+                }
+            }
+            
+            // 5. 특별 규칙: "하트"와 "사랑" 검색 시 하트 이모지들에게 최고 우선순위 보장
+            if (matched && (searchTerm === '하트' || searchTerm === '사랑')) {
+                if (item.emoji === '❤️') {
+                    score += 10000000; // 절대적 우선순위
+                } else if (item.emoji === '♥️') {
+                    score += 5000000;
+                } else if (item.emoji === '💑') {
+                    score += 1000000;
+                } else if (item.emoji === '💕') {
+                    score += 800000;
+                } else if (item.emoji === '💖') {
+                    score += 700000;
+                }
+            }
+            
+            if (matched) {
+                scoredResults.push({ item, score });
+            }
+        }
+        
+        // 점수 순으로 정렬
+        scoredResults.sort((a, b) => b.score - a.score);
+        const filtered = scoredResults.map(result => result.item);
+        
         this.renderDescriptions(filtered, searchTerm);
     }
 
