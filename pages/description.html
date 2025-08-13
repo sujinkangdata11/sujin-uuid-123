@@ -881,6 +881,11 @@ class DescriptionManager {
                         termScore += 60;
                         termMatched = true;
                         if (i === 0) termScore += 30;
+                    } else if (currentSearchTerm.includes(keyword)) {
+                        // 역방향 포함 매칭: 검색어가 키워드를 포함하는 경우
+                        termScore += 40;
+                        termMatched = true;
+                        if (i === 0) termScore += 30;
                     }
                 }
                 

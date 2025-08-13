@@ -240,9 +240,15 @@ class EmojiManager {
                         termMatched = true;
                         matchTypes.add('contain');
                     }
+                    // 역방향 포함 매칭: 검색어가 키워드를 포함하는 경우 (예: "검은색"이 "검은"을 포함)
+                    else if (currentSearchTerm.includes(keyword)) {
+                        termScore += 40;
+                        termMatched = true;
+                        matchTypes.add('reverse_contain');
+                    }
                     
                     // 첫 번째 키워드 매칭 시 보너스 점수
-                    if (i === 0 && (keyword === currentSearchTerm || keyword.startsWith(currentSearchTerm) || keyword.includes(currentSearchTerm))) {
+                    if (i === 0 && (keyword === currentSearchTerm || keyword.startsWith(currentSearchTerm) || keyword.includes(currentSearchTerm) || currentSearchTerm.includes(keyword))) {
                         termScore += 30;
                     }
                     
