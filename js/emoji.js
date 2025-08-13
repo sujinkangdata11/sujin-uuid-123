@@ -290,15 +290,15 @@ class EmojiManager {
             // 특별 규칙: "하트"와 "사랑" 검색 시 하트 이모지들에게 최고 우선순위 보장
             if (matched && (searchTerm === '하트' || searchTerm === '사랑')) {
                 if (emoji === '❤️') {
-                    score += 10000; // 절대적 우선순위
+                    score += 10000000; // 절대적 우선순위 - 1천만점
                 } else if (emoji === '♥️') {
-                    score += 9000;  // 두 번째 우선순위
+                    score += 5000000;  // 500만점
                 } else if (emoji === '💑') {
-                    score += 8500;  // 사랑 검색 시 커플 이모지 높은 우선순위
+                    score += 1000000;  // 100만점
                 } else if (emoji === '💕') {
-                    score += 8000;  // 세 번째 우선순위
+                    score += 800000;   // 80만점
                 } else if (emoji === '💖') {
-                    score += 7500;  // 네 번째 우선순위
+                    score += 700000;   // 70만점
                 }
             }
             
