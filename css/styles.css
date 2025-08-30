@@ -663,3 +663,72 @@ body {
         background: #007bff;
     }
 }
+
+/* 특수문자 탭 전용 스타일 */
+body.special-tab-active .main-content {
+    grid-template-columns: 1fr !important; /* 사이드바 숨기기 */
+    grid-template-areas: "main" !important;
+}
+
+body.special-tab-active .emoji-section {
+    grid-area: main !important;
+}
+
+/* 특수문자 탭에서 사이드바 완전 제거 - 최고 우선순위 */
+body.special-tab-active .sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+body.special-tab-active .ad-sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+.special-tab-active .floating-emoji-box {
+    display: none !important; /* 플로팅 박스 숨기기 */
+}
+
+/* 특수문자 탭에서 더 넓은 가로 사이즈 사용 */
+.special-tab-active .container {
+    max-width: 100% !important; /* 최대 너비 제한 제거 */
+    padding: 10px 20px !important; /* 좌우 여백 줄여서 더 넓게 사용 */
+    width: 100% !important;
+}
+
+.special-tab-active .emoji-section {
+    padding: 20px !important; /* 패딩 줄이기 */
+    width: 100% !important; /* 전체 너비 사용 */
+    max-width: none !important; /* 최대 너비 제한 제거 */
+    margin: 0 !important; /* 마진 제거 */
+}
+
+/* 추가적인 강제 숨김 CSS - 최고 우선순위 */
+body.special-tab-active .container .main-content .sidebar,
+.special-tab-active .container .main-content .sidebar,
+.special-tab-active .main-content .sidebar,
+.special-tab-active .sidebar,
+.special-tab-active div.sidebar,
+html .special-tab-active .sidebar,
+html body.special-tab-active .sidebar,
+html body.special-tab-active div.sidebar,
+html body.special-tab-active .container .main-content .sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    z-index: -1 !important;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "emoji-sujin",
+  "version": "1.0.0",
+  "description": "이모지 모음 웹사이트",
+  "main": "index.html",
+  "scripts": {
+    "start": "lsof -ti:5176 | xargs kill -9 2>/dev/null || true && python3 -m http.server 5176",
+    "dev": "npm start"
+  },
+  "keywords": ["emoji", "emoticon", "korean"],
+  "author": "sujin",
+  "license": "MIT"
+}

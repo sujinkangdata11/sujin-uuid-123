@@ -1,0 +1,1237 @@
+<!--/// 메시지 탭 전용 - 깔끔한 버전 ///-->
+
+<style>
+        .main-chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e5ea;
+            text-align: center;
+            flex-shrink: 0;
+            height: 80px;
+            box-sizing: border-box;
+        }
+        
+        .contact-info h3 {
+            color: #000;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .contact-info p {
+            color: #8e8e93;
+            font-size: 14px;
+        }
+        
+        :root {
+            --message-scale: 1;
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: calc(20px * var(--message-scale));
+            padding-bottom: calc(20px * var(--message-scale));
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #ffffff;
+            position: relative;
+            box-sizing: border-box;
+        }
+        
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #ffffff;
+            border-radius: 4px;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #f8f9fa;
+        }
+        
+        .messages-container {
+            scrollbar-width: thin;
+            scrollbar-color: #ffffff #ffffff;
+        }
+        
+        .messages-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 100%;
+            gap: calc(1px * var(--message-scale));
+        }
+        
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            max-width: 85%;
+            width: fit-content;
+        }
+        
+        .message-group.received {
+            align-self: flex-start;
+            margin-left: calc(16px * var(--message-scale));
+        }
+        
+        .message-group.sent {
+            align-self: flex-end;
+            margin-right: 0;
+        }
+        
+        .message-group .message:not(:first-child) {
+            margin-top: calc(1px * var(--message-scale));
+        }
+        
+        .message.image-message::before,
+        .message.image-message::after {
+            display: none;
+        }
+        
+        .message-group .message:not(:last-child)::before,
+        .message-group .message:not(:last-child)::after {
+            display: none;
+        }
+        
+        .message {
+            max-width: 85%;
+            min-width: fit-content;
+            width: auto;
+            padding: calc(12px * var(--message-scale)) calc(16px * var(--message-scale));
+            border-radius: calc(18px * var(--message-scale));
+            font-size: calc(16px * var(--message-scale));
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+            animation: messageSlide 0.3s ease-out;
+            transform-origin: bottom;
+            display: inline-block;
+        }
+        
+        @keyframes messageSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(calc(20px * var(--message-scale))) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .message.received {
+            background: #e5e5ea;
+            color: #000;
+            align-self: flex-start;
+        }
+        
+        .message.sent {
+            background: #007AFF;
+            color: white;
+            align-self: flex-end;
+        }
+        
+        /* 말풍선 꼬리 SVG - 받은 메시지용 (회색) */
+        .message.received:not(.image-message)::before {
+            display: block !important;
+            content: '' !important;
+            position: absolute !important;
+            bottom: calc(-16px * var(--message-scale)) !important;
+            left: calc(-16px * var(--message-scale)) !important;
+            width: calc(32px * var(--message-scale)) !important;
+            height: calc(32px * var(--message-scale)) !important;
+            background-image: url('data:image/svg+xml;charset=utf-8,%3C%3Fxml version="1.0" encoding="UTF-8"%3F%3E%3Csvg id="layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32"%3E%3Cdefs%3E%3Cstyle%3E.st0%7Bfill:%23e5e5ea%7D%3C/style%3E%3C/defs%3E%3Cpath class="st0" d="M16-7.39V6.27s-.25,7.85-4.85,9.73c0,0,5.72.5,8.92-3.04,0,0,2.71,3.02,8.13,3.02s1.78,0,1.78,0h4.34V-7.39"/%3E%3C/svg%3E') !important;
+            background-size: 100% 100% !important;
+            background-repeat: no-repeat !important;
+            background-color: transparent !important;
+            border-radius: 0 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* 말풍선 꼬리 SVG - 보낸 메시지용 (파란색) */
+        .message.sent:not(.image-message)::after {
+            display: block !important;
+            content: '' !important;
+            position: absolute !important;
+            bottom: calc(-16px * var(--message-scale)) !important;
+            right: calc(-16px * var(--message-scale)) !important;
+            width: calc(32px * var(--message-scale)) !important;
+            height: calc(32px * var(--message-scale)) !important;
+            background-image: url('data:image/svg+xml;charset=utf-8,%3C%3Fxml version="1.0" encoding="UTF-8"%3F%3E%3Csvg id="_레이어_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 32 32"%3E%3Cdefs%3E%3Cstyle%3E.st0%7Bfill:%231d74ff%7D%3C/style%3E%3C/defs%3E%3Cpath class="st0" d="M15.88-7.55V6.11s.25,7.85,4.85,9.73c0,0-5.72.5-8.92-3.04,0,0-2.71,3.02-8.13,3.02s-1.78,0-1.78,0H-2.43V-7.55"/%3E%3C/svg%3E') !important;
+            background-size: 100% 100% !important;
+            background-repeat: no-repeat !important;
+            background-color: transparent !important;
+            border-radius: 0 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* 이미지 메시지는 꼬리 숨기기 */
+        .message.received.image-message::before,
+        .message.sent.image-message::after {
+            display: none !important;
+        }
+        
+        .typing-indicator {
+            max-width: 85%;
+            width: fit-content;
+            padding: calc(12px * var(--message-scale)) calc(16px * var(--message-scale));
+            border-radius: calc(18px * var(--message-scale));
+            background: #e5e5ea;
+            align-self: flex-start;
+            display: none;
+            position: static;
+            margin: 0;
+            margin-left: calc(16px * var(--message-scale));
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: calc(4px * var(--message-scale));
+        }
+        
+        .typing-dot {
+            width: calc(8px * var(--message-scale));
+            height: calc(8px * var(--message-scale));
+            border-radius: 50%;
+            background: #8e8e93;
+            animation: typingDots 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingDots {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .emoji-only-message {
+            background: transparent !important;
+            padding: calc(8px * var(--message-scale)) !important;
+            font-size: calc(48px * var(--message-scale)) !important;
+            line-height: 1 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        
+        .share-icon {
+            width: calc(16px * var(--message-scale) * 0.9);
+            height: calc(16px * var(--message-scale) * 0.9);
+        }
+        
+        .message-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: currentColor;
+            animation: blink 1s infinite;
+            margin-left: 1px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .controls {
+            position: relative;
+            width: 300px;
+            background: #ffffff;
+            padding: 20px;
+            overflow-y: auto;
+            overflow-x: visible;
+            min-width: 300px;
+            max-width: 80vw;
+            height: calc(100vh - 40px);
+            flex-shrink: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .resize-handle {
+            position: absolute !important;
+            left: -31px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 60px !important;
+            height: 60px !important;
+            background: #007AFF !important;
+            border: 4px solid #ffffff !important;
+            border-radius: 50% !important;
+            cursor: col-resize !important;
+            z-index: 9999 !important;
+            transition: all 0.2s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4) !important;
+        }
+        
+        .resize-handle::before {
+            content: '⟷' !important;
+            font-size: 24px !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
+        }
+        
+        .resize-handle:hover {
+            background: #007AFF;
+            border-color: #007AFF;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+        
+        .resize-handle:hover::before {
+            color: white;
+        }
+        
+        .resize-handle.resizing {
+            background: #007AFF;
+            border-color: #007AFF;
+            transform: translateY(-50%) scale(1.2);
+            box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+        }
+        
+        .resize-handle.resizing::before {
+            color: white;
+        }
+
+        /* 메시지 타이퍼용 추가 스타일 */
+        .message-list {
+            margin-bottom: 20px;
+        }
+        
+        .message-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e5e5ea;
+            flex-wrap: wrap;
+            cursor: move;
+            transition: background-color 0.2s;
+        }
+        
+        .message-item:hover {
+            background: #e8f4fd;
+        }
+        
+        .message-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .drag-handle {
+            font-size: 16px;
+            color: #8e8e93;
+            cursor: grab;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .drag-handle::before {
+            content: "⋮⋮";
+            font-size: 14px;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        
+        .message-content {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .message-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .message-number {
+            min-width: 30px;
+            font-weight: 600;
+            color: #8e8e93;
+            font-size: 14px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e5e5ea;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #ffffff;
+            min-width: 300px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+        
+        .message-type-select {
+            padding: 8px 12px;
+            border: 1px solid #e5e5ea;
+            border-radius: 6px;
+            background: #ffffff;
+            font-size: 14px;
+            min-width: 100px;
+        }
+        
+        .message-type-select:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+        
+        .remove-btn {
+            padding: 6px 10px;
+            background: #ff3b30;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            min-width: 50px;
+        }
+        
+        .remove-btn:hover {
+            background: #d70015;
+        }
+        
+        .add-message-btn {
+            width: 100%;
+            padding: 12px;
+            background: #34c759;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .add-message-btn:hover {
+            background: #30d158;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #000;
+            font-weight: 500;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: #e5e5ea;
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #007AFF;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #007AFF;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+        }
+        
+        .speed-value {
+            min-width: 60px;
+            font-size: 16px;
+            color: #8e8e93;
+            text-align: right;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: #007AFF;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        button:hover {
+            background: #0056CC;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: #f2f2f7;
+            color: #007AFF;
+        }
+        
+        .secondary-button:hover {
+            background: #e5e5ea;
+        }
+        
+        .clear-button {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .clear-button:hover {
+            background: #d70015;
+        }
+        
+        /* 전체 컨테이너 스타일 - 2블록 나란히 배치 */
+        .message-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segue UI', system-ui, sans-serif;
+            background: #f5f5f7;
+            height: 100vh;
+            overflow: visible;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            padding: 20px;
+            gap: 2px;
+            border-radius: 12px;
+            max-width: 100%;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .message-container {
+                flex-direction: column;
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            .main-chat-area {
+                height: calc(60vh - 32px);
+                border-radius: 12px;
+            }
+            
+            .messages-container {
+                padding: 16px;
+            }
+            
+            .controls {
+                position: relative;
+                width: 100% !important;
+                height: calc(40vh - 32px);
+                padding: 16px;
+                overflow-y: auto;
+                border-radius: 12px;
+            }
+            
+            .resize-handle {
+                display: none;
+            }
+            
+            .message {
+                max-width: 85%;
+                font-size: 15px;
+            }
+            
+            .message-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .message-item > div {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+        }
+</style>
+
+<!-- 메시지 타이퍼 HTML -->
+<div class="message-container">
+    <div class="main-chat-area">
+        <div class="chat-header">
+            <div class="contact-info">
+                <h3>메시지 타이퍼</h3>
+                <p>깔끔한 메시지 스타일</p>
+            </div>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+            <div class="messages-wrapper" id="messagesWrapper">
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls" id="controlsPanel">
+        <div class="resize-handle" id="resizeHandle"></div>
+        
+        <div class="control-group">
+            <label>📁 텍스트 파일 업로드:</label>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <input type="file" id="textFileUpload" accept=".txt" style="padding: 10px; border: 2px dashed #007AFF; border-radius: 8px; background: #f8f9ff;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="showExampleBtn" class="secondary-button" style="padding: 6px 12px; font-size: 14px; margin: 0; flex: none;">텍스트 파일 예시</button>
+                    <div style="font-size: 13px; color: #8e8e93; line-height: 1.4; flex: 1;">
+                        <strong>사용법:</strong> "일반 텍스트" → 회색, "//텍스트" → 파란색
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>메시지 목록:</label>
+            <div class="message-list" id="messageList"></div>
+            <button class="add-message-btn" id="addMessageBtn">+ 메시지 추가</button>
+        </div>
+        
+        <div class="control-group">
+            <label>메시지 크기:</label>
+            <div class="slider-container">
+                <input type="range" id="scaleSlider" min="50" max="200" value="100">
+                <span class="speed-value" id="scaleValue">100%</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>재생 옵션:</label>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; margin-bottom: 0;">
+                    <input type="checkbox" id="loopMode">
+                    🔄 무한 반복 재생
+                </label>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>타이핑 모드:</label>
+            <select id="typingMode" class="message-type-select" style="width: 100%;">
+                <option value="character">⌨️ 한 글자씩 타이핑</option>
+                <option value="instant">⚡ 즉시 전체 표시</option>
+            </select>
+        </div>
+        
+        <div class="control-group" id="speedGroup">
+            <label>타이핑 속도:</label>
+            <div class="slider-container">
+                <input type="range" id="speedSlider" min="50" max="300" value="100">
+                <span class="speed-value" id="speedValue">100ms</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <div class="button-group">
+                <button id="startBtn">시작</button>
+                <button id="stopBtn" class="secondary-button">정지</button>
+                <button id="clearBtn" class="clear-button">클리어</button>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>🎥 화면 녹화:</label>
+            <div class="button-group">
+                <button id="recordBtn" style="background: #ff3b30;">● 녹화 시작</button>
+                <button id="stopRecordBtn" class="secondary-button" disabled>⏹ 녹화 정지</button>
+            </div>
+            <div id="recordStatus" style="font-size: 14px; color: #8e8e93; margin-top: 8px; display: none;">
+                🔴 녹화 중... <span id="recordTime">00:00</span>
+            </div>
+            <div id="downloadSection" style="margin-top: 10px; display: none;">
+                <a id="downloadLink" class="secondary-button" style="display: inline-block; text-decoration: none; text-align: center; color: #007AFF;">📥 동영상 다운로드</a>
+            </div>
+            <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; font-size: 13px; color: #856404;">
+                <strong>📌 녹화 사용법:</strong><br>
+                1. 새 탭에서 이 페이지를 열어주세요<br>
+                2. 주소창에서 <strong>HTTPS</strong>로 접속했는지 확인<br>
+                3. Chrome/Edge 사용 시 실험적 기능 활성화:<br>
+                &nbsp;&nbsp;&nbsp;<code>chrome://flags/#enable-experimental-web-platform-features</code><br>
+                4. 또는 <strong>OBS Studio</strong> 같은 화면 녹화 프로그램 사용 권장
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log('Clean message typer loaded');
+
+class CleanMessageTyper {
+    constructor() {
+        this.messagesContainer = document.getElementById('messagesContainer');
+        this.messagesWrapper = document.getElementById('messagesWrapper');
+        this.typingIndicator = document.getElementById('typingIndicator');
+        this.messageList = document.getElementById('messageList');
+        this.addMessageBtn = document.getElementById('addMessageBtn');
+        this.typingMode = document.getElementById('typingMode');
+        this.speedGroup = document.getElementById('speedGroup');
+        this.speedSlider = document.getElementById('speedSlider');
+        this.speedValue = document.getElementById('speedValue');
+        this.scaleSlider = document.getElementById('scaleSlider');
+        this.scaleValue = document.getElementById('scaleValue');
+        this.startBtn = document.getElementById('startBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.clearBtn = document.getElementById('clearBtn');
+        
+        this.recordBtn = document.getElementById('recordBtn');
+        this.stopRecordBtn = document.getElementById('stopRecordBtn');
+        this.recordStatus = document.getElementById('recordStatus');
+        this.recordTime = document.getElementById('recordTime');
+        this.downloadSection = document.getElementById('downloadSection');
+        this.downloadLink = document.getElementById('downloadLink');
+        
+        this.loopMode = document.getElementById('loopMode');
+        this.textFileUpload = document.getElementById('textFileUpload');
+        this.showExampleBtn = document.getElementById('showExampleBtn');
+        this.resizeHandle = document.getElementById('resizeHandle');
+        this.controls = document.querySelector('.controls');
+        
+        this.messages = [];
+        this.currentMessageIndex = 0;
+        this.currentText = '';
+        this.targetText = '';
+        this.currentMessageType = '';
+        this.isTyping = false;
+        this.typeTimeout = null;
+        this.messageTimeout = null;
+        this.messageCounter = 1;
+        
+        this.mediaRecorder = null;
+        this.recordedChunks = [];
+        this.isRecording = false;
+        this.recordStartTime = null;
+        this.recordTimer = null;
+        
+        this.isResizing = false;
+        this.currentControlsWidth = 400;
+        
+        this.initEventListeners();
+        this.initResizer();
+        this.updateSpeedDisplay();
+        this.updateScaleDisplay();
+        this.updateSpeedGroupVisibility();
+        this.addInitialMessages();
+        this.updateControlsWidth();
+    }
+    
+    initEventListeners() {
+        console.log('Initializing event listeners...');
+        
+        this.startBtn.addEventListener('click', () => this.startTyping());
+        this.stopBtn.addEventListener('click', () => this.stopTyping());
+        this.clearBtn.addEventListener('click', () => this.clearMessages());
+        this.addMessageBtn.addEventListener('click', () => this.addMessage());
+        
+        this.recordBtn.addEventListener('click', () => this.startRecording());
+        this.stopRecordBtn.addEventListener('click', () => this.stopRecording());
+        
+        this.speedSlider.addEventListener('input', () => this.updateSpeedDisplay());
+        this.scaleSlider.addEventListener('input', () => this.updateScaleDisplay());
+        
+        this.typingMode.addEventListener('change', () => this.updateSpeedGroupVisibility());
+        
+        if (this.textFileUpload) {
+            this.textFileUpload.addEventListener('change', (e) => {
+                this.handleTextFileUpload(e);
+            });
+        }
+        
+        if (this.showExampleBtn) {
+            this.showExampleBtn.addEventListener('click', () => this.showExample());
+        }
+    }
+    
+    showExample() {
+        alert('텍스트 파일 예시:\n\n"안녕하세요!"\n"//네, 안녕하세요!"\n"오늘 날씨가 좋네요."\n"//그러게요. 산책하기 좋을 것 같아요."');
+    }
+    
+    handleTextFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file || !file.name.toLowerCase().endsWith('.txt')) {
+            alert('텍스트 파일(.txt)만 업로드 가능합니다.');
+            event.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target.result;
+                this.parseTextFile(content);
+                event.target.value = '';
+            } catch (error) {
+                console.error('Error reading file:', error);
+                alert('파일을 읽는 중 오류가 발생했습니다.');
+                event.target.value = '';
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+    
+    parseTextFile(content) {
+        this.messageList.innerHTML = '';
+        this.messageCounter = 1;
+        
+        const lines = content.split('\n');
+        let addedCount = 0;
+        
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine === '') return;
+            
+            let messageText = '';
+            let messageType = 'received';
+            
+            let processedLine = trimmedLine;
+            if (processedLine.startsWith('"') && processedLine.endsWith('"')) {
+                processedLine = processedLine.slice(1, -1);
+            }
+            
+            if (processedLine.startsWith('//')) {
+                messageType = 'sent';
+                messageText = processedLine.substring(2).trim();
+            } else {
+                messageType = 'received';
+                messageText = processedLine;
+            }
+            
+            if (messageText) {
+                this.addMessage(messageText, messageType);
+                addedCount++;
+            }
+        });
+        
+        if (addedCount > 0) {
+            alert(`✅ ${addedCount}개의 메시지가 추가되었습니다!`);
+        } else {
+            alert('⚠️ 유효한 메시지가 없습니다.');
+        }
+    }
+    
+    initResizer() {
+        if (!this.resizeHandle) return;
+        
+        let startX = 0;
+        let startWidth = 0;
+        
+        this.resizeHandle.addEventListener('mousedown', (e) => {
+            this.isResizing = true;
+            startX = e.clientX;
+            startWidth = this.currentControlsWidth;
+            
+            this.resizeHandle.classList.add('resizing');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isResizing) return;
+            
+            const deltaX = startX - e.clientX;
+            const newWidth = Math.max(300, Math.min(window.innerWidth * 0.8, startWidth + deltaX));
+            
+            this.currentControlsWidth = newWidth;
+            this.updateControlsWidth();
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (this.isResizing) {
+                this.isResizing = false;
+                this.resizeHandle.classList.remove('resizing');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+    }
+    
+    updateControlsWidth() {
+        this.controls.style.width = this.currentControlsWidth + 'px';
+    }
+    
+    addInitialMessages() {
+        this.addMessage('안녕하세요! 반갑습니다.', 'received');
+        this.addMessage('네, 잘 지내고 있어요!', 'sent');
+        this.addMessage('깔끔한 메시지 스타일이에요.', 'received');
+        this.addMessage('스크롤 테스트를 위해 메시지를 더 추가해볼게요.', 'sent');
+    }
+    
+    addMessage(text = '', type = 'received') {
+        const messageItem = document.createElement('div');
+        messageItem.className = 'message-item';
+        messageItem.innerHTML = `
+            <div class="drag-handle"></div>
+            <div class="message-number">${this.messageCounter}</div>
+            <div class="message-content">
+                <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
+                <div style="margin-top: 8px;">
+                    <select class="message-type-select">
+                        <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
+                        <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
+                    </select>
+                </div>
+            </div>
+            <div class="message-controls">
+                <button class="remove-btn" onclick="this.closest('.message-item').remove()">삭제</button>
+            </div>
+        `;
+        
+        this.messageList.appendChild(messageItem);
+        
+        const textInput = messageItem.querySelector('.message-input');
+        textInput.addEventListener('input', () => {
+            textInput.style.height = 'auto';
+            textInput.style.height = textInput.scrollHeight + 'px';
+        });
+        
+        this.messageCounter++;
+    }
+    
+    updateSpeedDisplay() {
+        this.speedValue.textContent = this.speedSlider.value + 'ms';
+    }
+    
+    updateScaleDisplay() {
+        const scale = this.scaleSlider.value / 100;
+        this.scaleValue.textContent = this.scaleSlider.value + '%';
+        document.documentElement.style.setProperty('--message-scale', scale);
+    }
+    
+    updateSpeedGroupVisibility() {
+        const isCharacterMode = this.typingMode.value === 'character';
+        this.speedGroup.style.display = isCharacterMode ? 'block' : 'none';
+    }
+    
+    startTyping() {
+        if (this.isTyping) return;
+        
+        this.messages = this.collectMessages();
+        if (this.messages.length === 0) return;
+        
+        this.currentMessageIndex = 0;
+        this.isTyping = true;
+        this.updateButtons();
+        this.typeNextMessage();
+    }
+    
+    collectMessages() {
+        const messageItems = this.messageList.querySelectorAll('.message-item');
+        const messages = [];
+        
+        messageItems.forEach(item => {
+            const typeSelect = item.querySelector('.message-type-select');
+            const textInput = item.querySelector('.message-input');
+            
+            if (!typeSelect) return;
+            
+            const text = textInput.value.trim();
+            if (text) {
+                messages.push({
+                    type: typeSelect.value,
+                    text: text
+                });
+            }
+        });
+        
+        return messages;
+    }
+    
+    typeNextMessage() {
+        if (!this.isTyping || this.currentMessageIndex >= this.messages.length) {
+            if (this.loopMode.checked && this.messages.length > 0) {
+                setTimeout(() => {
+                    this.clearMessagesOnly();
+                    this.currentMessageIndex = 0;
+                    this.typeNextMessage();
+                }, 2000);
+                return;
+            }
+            
+            this.isTyping = false;
+            this.updateButtons();
+            this.hideTypingIndicator();
+            return;
+        }
+        
+        const message = this.messages[this.currentMessageIndex];
+        this.currentMessageType = message.type;
+        
+        if (this.currentMessageType === 'received') {
+            this.showTypingIndicator();
+            
+            this.messageTimeout = setTimeout(() => {
+                this.hideTypingIndicator();
+                this.startMessageTyping(message);
+            }, Math.random() * 1000 + 1000);
+        } else {
+            this.startMessageTyping(message);
+        }
+    }
+    
+    clearMessagesOnly() {
+        const messages = this.messagesContainer.querySelectorAll('.message, .message-group');
+        messages.forEach(msg => msg.remove());
+    }
+    
+    startMessageTyping(message) {
+        if (!this.isTyping) return;
+        
+        const messageGroup = document.createElement('div');
+        messageGroup.className = `message-group ${message.type}`;
+        
+        const textEl = document.createElement('div');
+        textEl.className = `message ${message.type}`;
+        messageGroup.appendChild(textEl);
+        
+        this.targetText = message.text;
+        this.currentText = '';
+        
+        this.messagesWrapper.appendChild(messageGroup);
+        this.scrollToBottom();
+        
+        if (this.typingMode.value === 'instant') {
+            textEl.textContent = this.targetText;
+            this.currentMessageIndex++;
+            this.messageTimeout = setTimeout(() => {
+                this.typeNextMessage();
+            }, 1000);
+        } else {
+            this.typeCharacterForText(textEl);
+        }
+    }
+    
+    typeCharacterForText(textEl) {
+        if (!this.isTyping) return;
+        
+        if (this.currentText.length < this.targetText.length) {
+            this.currentText += this.targetText[this.currentText.length];
+            textEl.innerHTML = this.currentText + '<span class="message-cursor"></span>';
+            
+            const speed = parseInt(this.speedSlider.value);
+            this.typeTimeout = setTimeout(() => this.typeCharacterForText(textEl), speed);
+        } else {
+            textEl.textContent = this.currentText;
+            this.currentMessageIndex++;
+            this.messageTimeout = setTimeout(() => {
+                this.typeNextMessage();
+            }, 1000);
+        }
+        
+        this.scrollToBottom();
+    }
+    
+    showTypingIndicator() {
+        this.typingIndicator.style.display = 'block';
+        this.messagesWrapper.appendChild(this.typingIndicator);
+        this.scrollToBottom();
+    }
+    
+    hideTypingIndicator() {
+        this.typingIndicator.style.display = 'none';
+    }
+    
+    scrollToBottom() {
+        setTimeout(() => {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }, 10);
+    }
+    
+    stopTyping() {
+        this.isTyping = false;
+        
+        if (this.typeTimeout) {
+            clearTimeout(this.typeTimeout);
+            this.typeTimeout = null;
+        }
+        
+        if (this.messageTimeout) {
+            clearTimeout(this.messageTimeout);
+            this.messageTimeout = null;
+        }
+        
+        this.hideTypingIndicator();
+        this.updateButtons();
+    }
+    
+    clearMessages() {
+        this.stopTyping();
+        const messages = this.messagesContainer.querySelectorAll('.message');
+        messages.forEach(msg => msg.remove());
+    }
+    
+    updateButtons() {
+        this.startBtn.disabled = this.isTyping;
+        this.stopBtn.disabled = !this.isTyping;
+    }
+    
+    async startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({
+                video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+                audio: false
+            });
+            
+            this.mediaRecorder = new MediaRecorder(stream);
+            this.recordedChunks = [];
+            
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.recordedChunks.push(event.data);
+                }
+            };
+            
+            this.mediaRecorder.onstop = () => {
+                const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                this.downloadLink.href = url;
+                this.downloadLink.download = `message-recording-${Date.now()}.webm`;
+                this.downloadSection.style.display = 'block';
+                
+                stream.getTracks().forEach(track => track.stop());
+                alert('녹화가 완료되었습니다!');
+            };
+            
+            this.mediaRecorder.start(1000);
+            this.isRecording = true;
+            this.recordStartTime = Date.now();
+            
+            this.recordBtn.disabled = true;
+            this.stopRecordBtn.disabled = false;
+            this.recordStatus.style.display = 'block';
+            this.downloadSection.style.display = 'none';
+            
+            this.recordTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - this.recordStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const seconds = (elapsed % 60).toString().padStart(2, '0');
+                this.recordTime.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+            
+        } catch (error) {
+            console.error('녹화 시작 실패:', error);
+            alert('화면 녹화를 시작할 수 없습니다.');
+        }
+    }
+    
+    stopRecording() {
+        if (this.mediaRecorder && this.isRecording) {
+            this.mediaRecorder.stop();
+            this.isRecording = false;
+            
+            this.recordBtn.disabled = false;
+            this.stopRecordBtn.disabled = true;
+            this.recordStatus.style.display = 'none';
+            
+            if (this.recordTimer) {
+                clearInterval(this.recordTimer);
+                this.recordTimer = null;
+            }
+        }
+    }
+}
+
+// 즉시 초기화
+try {
+    const messageTyper = new CleanMessageTyper();
+    console.log('CleanMessageTyper initialized successfully');
+} catch (error) {
+    console.error('Error initializing CleanMessageTyper:', error);
+}
+</script>

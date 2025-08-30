@@ -120,41 +120,42 @@ class Navigation {
     async loadPageContent(contentType) {
         let contentContainer = document.querySelector('.main-section-content');
         
-        // 메시지 탭은 별도 처리 (emoji-section 제거하고 평평한 구조)
+        // 메시지 탭은 별도 처리 (독립적인 구조)
         if (contentType === 'message') {
+            // 메시지 탭은 DOM 구조를 건드리지 않고 직접 컨텐츠 로드
             const mainContent = document.querySelector('.main-content');
-            // 메시지 탭에서는 기본 중첩 구조를 완전히 재구성
-            if (mainContent) {
-                console.log('메시지 탭: emoji-section 제거하고 평평한 구조로 재구성');
+            if (mainContent && !contentContainer) {
+                // 메시지 탭용 단순화된 구조
+                console.log('메시지 탭 전용 DOM 구조 생성 중...');
                 mainContent.innerHTML = `
-                    <!--/// BACKUP - 메시지 탭 평평한 구조 시작 ///-->
+                    <!--/// BACKUP - 메시지 탭 전용 구조 시작 ///-->
                     <div class="main-section-content">
-                        <!-- 메시지 페이지 컨텐츠가 emoji-section 없이 직접 로드됩니다 -->
+                        <!-- 메시지 페이지 컨텐츠가 여기에 동적으로 로드됩니다 -->
                     </div>
-                    <!--/// BACKUP - 메시지 탭 평평한 구조 끝 ///-->
+                    <!--/// BACKUP - 메시지 탭 전용 구조 끝 ///-->
                 `;
                 contentContainer = document.querySelector('.main-section-content');
             }
         } else {
-            // 다른 탭들은 기존 emoji-section 구조 강제 복원
-            const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                console.log(`다른 탭 (${contentType}): emoji-section 구조 강제 복원`);
-                // 다른 탭들은 항상 기존 구조로 재설정
-                mainContent.innerHTML = `
-                    <!--/// 다른 탭들 강제 복원: emoji-section 포함 구조 ///-->
-                    <div class="emoji-section">
-                        <div class="main-section-content">
-                            <!-- 페이지 컨텐츠가 여기에 동적으로 로드됩니다 -->
+            // 다른 탭들은 기존 공통 구조 사용
+            if (!contentContainer) {
+                console.log('기존 탭 DOM 구조 복원 중...');
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.innerHTML = `
+                        <div class="emoji-section">
+                            <div class="main-section-content">
+                                <!-- 페이지 컨텐츠가 여기에 동적으로 로드됩니다 -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="sidebar">
-                        <div class="ad-sidebar">
-                            광고 영역
+                        <div class="sidebar">
+                            <div class="ad-sidebar">
+                                광고 영역
+                            </div>
                         </div>
-                    </div>
-                `;
-                contentContainer = document.querySelector('.main-section-content');
+                    `;
+                    contentContainer = document.querySelector('.main-section-content');
+                }
             }
         }
         
