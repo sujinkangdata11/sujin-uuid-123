@@ -537,8 +537,6 @@
         }
 
         ////미디어/// CSS 스타일 시작 ////
-        /* 미디어 관련 CSS - 현재 주석 처리됨 */
-        /*
         .content-type-toggle {
             display: flex;
             gap: 5px;
@@ -588,16 +586,17 @@
             height: calc(16px * var(--message-scale) * 0.9);
         }
 
+        /* 이미지 메시지는 꼬리 제거 */
         .message.image-message::before,
         .message.image-message::after {
             display: none;
         }
 
+        /* 그룹 내 텍스트 메시지도 꼬리 제거 (이미지와 함께 있을 때) */
         .message-group .message:not(:last-child)::before,
         .message-group .message:not(:last-child)::after {
             display: none;
         }
-        */
         ////미디어/// CSS 스타일 끝 ////
         
         .remove-btn {
@@ -1343,7 +1342,7 @@ class CleanMessageTyper {
         return button;
     }
 
-    addMessage(text = '', type = 'received') {
+    addMessage(text = '', type = 'received', hasMedia = false, mediaType = 'image') {
         const messageItem = document.createElement('div');
         messageItem.className = 'message-item';
         
@@ -1357,33 +1356,51 @@ class CleanMessageTyper {
         
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
-        
-        const textarea = document.createElement('textarea');
-        textarea.className = 'message-input';
-        textarea.placeholder = '메시지를 입력하세요';
-        textarea.rows = 3;
-        textarea.value = text;
+        messageContent.innerHTML = `
+            <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
+            
+            <div class="content-type-toggle">
+                <label>
+                    <input type="checkbox" class="media-checkbox" ${hasMedia ? 'checked' : ''}>
+                    📎 미디어 추가
+                </label>
+            </div>
+            
+            <div class="media-upload-area" style="display: ${hasMedia ? 'block' : 'none'};">
+                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                    <label>
+                        <input type="radio" class="media-type-radio" name="media-type-${this.messageCounter}" value="image" ${!hasMedia || mediaType === 'image' ? 'checked' : ''}>
+                        🖼️ 이미지
+                    </label>
+                    <label>
+                        <input type="radio" class="media-type-radio" name="media-type-${this.messageCounter}" value="video" ${hasMedia && mediaType === 'video' ? 'checked' : ''}>
+                        🎬 동영상
+                    </label>
+                </div>
+                <input type="file" class="media-upload-input" accept="image/*">
+                <img class="media-preview" alt="미리보기">
+                <video class="video-preview" controls muted></video>
+                <div class="file-info" style="font-size: 12px; color: #8e8e93; margin-top: 5px;"></div>
+            </div>
+            
+            <div class="message-type-toggle">
+                <select class="message-type-select">
+                    <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
+                    <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
+                </select>
+            </div>
+        `;
         
         const controls = document.createElement('div');
         controls.className = 'message-controls';
         controls.style.marginTop = '8px';
-        
-        const select = document.createElement('select');
-        select.className = 'message-type-select';
-        select.innerHTML = `
-            <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
-            <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
-        `;
         
         // 삭제 버튼 컴포넌트 생성
         const deleteButton = this.createDeleteButton(() => {
             messageItem.remove();
         });
         
-        // 요소들 조립
-        controls.appendChild(select);
         controls.appendChild(deleteButton);
-        messageContent.appendChild(textarea);
         messageContent.appendChild(controls);
         messageItem.appendChild(handleContainer);
         messageItem.appendChild(messageContent);
@@ -1391,7 +1408,7 @@ class CleanMessageTyper {
         this.messageList.appendChild(messageItem);
         
         ////미디어/// JavaScript 이벤트 리스너 시작 ////
-        /* 미디어 관련 JavaScript - 현재 주석 처리됨
+        // 이벤트 리스너 추가
         const mediaCheckbox = messageItem.querySelector('.media-checkbox');
         const mediaRadios = messageItem.querySelectorAll('.media-type-radio');
         const mediaArea = messageItem.querySelector('.media-upload-area');
@@ -1399,89 +1416,88 @@ class CleanMessageTyper {
         const mediaPreview = messageItem.querySelector('.media-preview');
         const videoPreview = messageItem.querySelector('.video-preview');
         const fileInfo = messageItem.querySelector('.file-info');
-        
-        if (mediaCheckbox) {
-            mediaCheckbox.addEventListener('change', () => {
-                if (mediaCheckbox.checked) {
-                    mediaArea.style.display = 'block';
-                    const imageRadio = mediaArea.querySelector('input[value="image"]');
-                    imageRadio.checked = true;
-                    mediaInput.accept = 'image/*';
-                } else {
-                    mediaArea.style.display = 'none';
-                    mediaInput.value = '';
-                    mediaPreview.style.display = 'none';
-                    videoPreview.style.display = 'none';
-                    fileInfo.textContent = '';
-                }
-            });
-        }
-        
-        if (mediaRadios) {
-            mediaRadios.forEach(radio => {
-                radio.addEventListener('change', () => {
-                    const selectedValue = radio.value;
-                    if (selectedValue === 'image') {
-                        mediaInput.accept = 'image/*';
-                        videoPreview.style.display = 'none';
-                        if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('video/')) {
-                            mediaInput.value = '';
-                            fileInfo.textContent = '';
-                        }
-                    } else if (selectedValue === 'video') {
-                        mediaInput.accept = 'video/*';
-                        mediaPreview.style.display = 'none';
-                        if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('image/')) {
-                            mediaInput.value = '';
-                            fileInfo.textContent = '';
-                        }
-                    }
-                });
-            });
-        }
-        
-        if (mediaInput) {
-            mediaInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const maxSize = 5 * 1024 * 1024;
-                    if (file.size > maxSize) {
-                        alert('파일 크기가 5MB를 초과합니다. 더 작은 파일을 선택해주세요.');
-                        mediaInput.value = '';
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        if (file.type.startsWith('image/')) {
-                            mediaPreview.src = e.target.result;
-                            mediaPreview.style.display = 'block';
-                            videoPreview.style.display = 'none';
-                        } else if (file.type.startsWith('video/')) {
-                            videoPreview.src = e.target.result;
-                            videoPreview.style.display = 'block';
-                            mediaPreview.style.display = 'none';
-                        }
-                        
-                        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-                        fileInfo.textContent = `${file.name} (${sizeInMB}MB)`;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    mediaPreview.style.display = 'none';
-                    videoPreview.style.display = 'none';
-                    fileInfo.textContent = '';
-                }
-            });
-        }
-        */
-        ////미디어/// JavaScript 이벤트 리스너 끝 ////
-
         const textInput = messageItem.querySelector('.message-input');
+        
         textInput.addEventListener('input', () => {
+            // 자동 높이 조절
             textInput.style.height = 'auto';
             textInput.style.height = textInput.scrollHeight + 'px';
         });
+        
+        mediaCheckbox.addEventListener('change', () => {
+            if (mediaCheckbox.checked) {
+                mediaArea.style.display = 'block';
+                // 기본값을 이미지로 설정
+                const imageRadio = mediaArea.querySelector('input[value="image"]');
+                imageRadio.checked = true;
+                mediaInput.accept = 'image/*';
+            } else {
+                mediaArea.style.display = 'none';
+                mediaInput.value = '';
+                mediaPreview.style.display = 'none';
+                videoPreview.style.display = 'none';
+                fileInfo.textContent = '';
+            }
+        });
+        
+        mediaRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                const selectedValue = radio.value;
+                if (selectedValue === 'image') {
+                    mediaInput.accept = 'image/*';
+                    videoPreview.style.display = 'none';
+                    // 기존 동영상 파일이 있다면 제거
+                    if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('video/')) {
+                        mediaInput.value = '';
+                        fileInfo.textContent = '';
+                    }
+                } else if (selectedValue === 'video') {
+                    mediaInput.accept = 'video/*';
+                    mediaPreview.style.display = 'none';
+                    // 기존 이미지 파일이 있다면 제거
+                    if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('image/')) {
+                        mediaInput.value = '';
+                        fileInfo.textContent = '';
+                    }
+                }
+            });
+        });
+        
+        mediaInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // 파일 크기 체크 (5MB = 5 * 1024 * 1024 bytes)
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('파일 크기가 5MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+                    mediaInput.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (file.type.startsWith('image/')) {
+                        mediaPreview.src = e.target.result;
+                        mediaPreview.style.display = 'block';
+                        videoPreview.style.display = 'none';
+                    } else if (file.type.startsWith('video/')) {
+                        videoPreview.src = e.target.result;
+                        videoPreview.style.display = 'block';
+                        mediaPreview.style.display = 'none';
+                    }
+                    
+                    // 파일 정보 표시
+                    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    fileInfo.textContent = `${file.name} (${sizeInMB}MB)`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                mediaPreview.style.display = 'none';
+                videoPreview.style.display = 'none';
+                fileInfo.textContent = '';
+            }
+        });
+        ////미디어/// JavaScript 이벤트 리스너 끝 ////
         
         this.messageCounter++;
     }
@@ -1520,14 +1536,36 @@ class CleanMessageTyper {
         messageItems.forEach(item => {
             const typeSelect = item.querySelector('.message-type-select');
             const textInput = item.querySelector('.message-input');
+            const mediaCheckbox = item.querySelector('.media-checkbox');
+            const selectedMediaType = item.querySelector('.media-type-radio:checked')?.value || 'image';
+            const mediaPreview = item.querySelector('.media-preview');
+            const videoPreview = item.querySelector('.video-preview');
             
             if (!typeSelect) return;
             
             const text = textInput.value.trim();
-            if (text) {
+            const hasMedia = mediaCheckbox.checked;
+            let mediaSrc = null;
+            let mediaType = selectedMediaType;
+            
+            if (hasMedia) {
+                if (selectedMediaType === 'image' && mediaPreview.src && mediaPreview.style.display !== 'none') {
+                    mediaSrc = mediaPreview.src;
+                } else if (selectedMediaType === 'video' && videoPreview.src && videoPreview.style.display !== 'none') {
+                    mediaSrc = videoPreview.src;
+                } else {
+                    hasMedia = false;
+                }
+            }
+            
+            // 텍스트나 미디어 중 하나라도 있으면 메시지로 추가
+            if (text || hasMedia) {
                 messages.push({
                     type: typeSelect.value,
-                    text: text
+                    text: text,
+                    hasMedia: hasMedia,
+                    mediaSrc: mediaSrc,
+                    mediaType: mediaType
                 });
             }
         });
@@ -1575,21 +1613,22 @@ class CleanMessageTyper {
     startMessageTyping(message) {
         if (!this.isTyping) return;
         
+        this.currentMessageType = message.type;
+        
+        // 메시지 그룹 생성 (이미지와 텍스트를 묶기 위해)
         const messageGroup = document.createElement('div');
-        messageGroup.className = `message-group ${message.type}`;
+        messageGroup.className = `message-group ${this.currentMessageType}`;
         
         ////미디어/// 메시지 타이핑 시 미디어 처리 시작 ////
-        /* 미디어 관련 메시지 표시 로직 - 현재 주석 처리됨
         if (message.hasMedia) {
+            // 미디어 메시지 생성
             const mediaContainer = document.createElement('div');
-            mediaContainer.className = `message ${message.type} image-message`;
-            mediaContainer.style.cssText = `
-                padding: 0px;
-                background: transparent;
-                display: flex;
-                align-items: center;
-                gap: calc(8px * var(--message-scale));
-            `;
+            mediaContainer.className = `message ${this.currentMessageType} image-message`;
+            mediaContainer.style.padding = '0px';
+            mediaContainer.style.background = 'transparent';
+            mediaContainer.style.display = 'flex';
+            mediaContainer.style.alignItems = 'center';
+            mediaContainer.style.gap = `calc(8px * var(--message-scale))`;
             
             const mediaEl = document.createElement('div');
             mediaEl.style.position = 'relative';
@@ -1597,22 +1636,18 @@ class CleanMessageTyper {
             if (message.mediaType === 'image') {
                 const img = document.createElement('img');
                 img.src = message.mediaSrc;
-                img.style.cssText = `
-                    width: calc(200px * var(--message-scale));
-                    height: auto;
-                    border-radius: calc(18px * var(--message-scale));
-                    display: block;
-                `;
+                img.style.width = `calc(200px * var(--message-scale))`;
+                img.style.height = 'auto';
+                img.style.borderRadius = `calc(18px * var(--message-scale))`;
+                img.style.display = 'block';
                 mediaEl.appendChild(img);
             } else if (message.mediaType === 'video') {
                 const video = document.createElement('video');
                 video.src = message.mediaSrc;
-                video.style.cssText = `
-                    width: calc(200px * var(--message-scale));
-                    height: auto;
-                    border-radius: calc(18px * var(--message-scale));
-                    display: block;
-                `;
+                video.style.width = `calc(200px * var(--message-scale))`;
+                video.style.height = 'auto';
+                video.style.borderRadius = `calc(18px * var(--message-scale))`;
+                video.style.display = 'block';
                 video.controls = true;
                 video.autoplay = true;
                 video.muted = true;
@@ -1621,6 +1656,7 @@ class CleanMessageTyper {
                 mediaEl.appendChild(video);
             }
             
+            // iPhone 스타일 공유 버튼 생성
             const shareBtn = document.createElement('div');
             shareBtn.className = 'share-button';
             shareBtn.style.cssText = `
@@ -1639,6 +1675,7 @@ class CleanMessageTyper {
                 align-self: center;
             `;
             
+            // 공유 아이콘 - CSS 변수를 사용해서 실시간 크기 조정
             shareBtn.innerHTML = `
                 <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -1647,6 +1684,20 @@ class CleanMessageTyper {
                 </svg>
             `;
             
+            // 호버 효과
+            shareBtn.addEventListener('mouseenter', () => {
+                shareBtn.style.background = 'rgba(255, 255, 255, 1)';
+                shareBtn.style.transform = 'scale(1.1)';
+                shareBtn.style.borderColor = '#d1d1d6';
+            });
+            
+            shareBtn.addEventListener('mouseleave', () => {
+                shareBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                shareBtn.style.transform = 'scale(1)';
+                shareBtn.style.borderColor = '#e5e5ea';
+            });
+            
+            // 클릭 이벤트 (실제 다운로드 기능)
             shareBtn.addEventListener('click', () => {
                 const link = document.createElement('a');
                 link.href = message.mediaSrc;
@@ -1658,27 +1709,59 @@ class CleanMessageTyper {
             mediaContainer.appendChild(shareBtn);
             messageGroup.appendChild(mediaContainer);
         }
-        */
         ////미디어/// 메시지 타이핑 시 미디어 처리 끝 ////
         
-        const textEl = document.createElement('div');
-        textEl.className = `message ${message.type}`;
-        messageGroup.appendChild(textEl);
-        
-        this.targetText = message.text;
-        this.currentText = '';
-        
-        this.messagesWrapper.appendChild(messageGroup);
-        this.scrollToBottom();
-        
-        if (this.typingMode.value === 'instant') {
-            textEl.textContent = this.targetText;
+        if (message.text) {
+            // 이모지만 있는지 확인 (공백 제거 후)
+            const trimmedText = message.text.trim();
+            const isEmojiOnly = this.isEmojiOnly(trimmedText);
+            
+            // 텍스트 메시지 생성
+            const textEl = document.createElement('div');
+            textEl.className = `message ${this.currentMessageType}`;
+            
+            // 이모지만 있으면 특별한 스타일 적용
+            if (isEmojiOnly) {
+                textEl.classList.add('emoji-only-message');
+            }
+            
+            messageGroup.appendChild(textEl);
+            
+            this.targetText = message.text;
+            this.currentText = '';
+            
+            // 메시지 그룹을 컨테이너에 추가
+            this.messagesWrapper.appendChild(messageGroup);
+            this.scrollToBottom();
+            
+            // 타이핑 모드에 따라 다르게 처리
+            if (this.typingMode.value === 'instant') {
+                // 즉시 전체 표시 모드
+                textEl.textContent = this.targetText;
+                
+                // 다음 메시지로 이동
+                this.currentMessageIndex++;
+                
+                // 1초 후 다음 메시지 시작
+                this.messageTimeout = setTimeout(() => {
+                    this.typeNextMessage();
+                }, 1000);
+            } else {
+                // 한 글자씩 타이핑 모드
+                this.typeCharacterForText(textEl);
+            }
+        } else if (message.hasMedia) {
+            // 미디어만 있는 경우
+            this.messagesWrapper.appendChild(messageGroup);
+            this.scrollToBottom();
+            
+            // 바로 다음 메시지로
             this.currentMessageIndex++;
+            
+            // 1초 후 다음 메시지 시작
             this.messageTimeout = setTimeout(() => {
                 this.typeNextMessage();
             }, 1000);
-        } else {
-            this.typeCharacterForText(textEl);
         }
     }
     
@@ -1716,6 +1799,12 @@ class CleanMessageTyper {
         setTimeout(() => {
             this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
         }, 10);
+    }
+    
+    isEmojiOnly(text) {
+        // 이모지만 있는지 확인하는 함수
+        const emojiRegex = /^[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Presentation}\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}\u{1F9B0}-\u{1F9B3}\s]*$/u;
+        return emojiRegex.test(text) && text.length > 0;
     }
     
     stopTyping() {
