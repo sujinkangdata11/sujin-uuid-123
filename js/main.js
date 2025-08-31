@@ -19,13 +19,13 @@ class App {
 
     async initializeApp() {
         try {
-            // 네비게이션 초기화
+            // URL 기반 탭 상태 우선 처리 (네비게이션 초기화 전에)
+            await this.handleInitialTab();
+            
+            // 네비게이션 초기화 (탭 상태 처리 후)
             if (window.Navigation) {
                 this.navigation = new window.Navigation();
             }
-
-            // URL 기반 탭 상태 우선 처리 (기본 페이지 로드 전에)
-            await this.handleInitialTab();
 
             console.log('앱이 성공적으로 초기화되었습니다.');
         } catch (error) {
@@ -72,10 +72,62 @@ class App {
             }
         }
         
-        // 네비게이션 초기 URL 처리 방지하고 직접 컨텐츠 로드
-        if (this.navigation) {
-            await this.navigation.loadPageContent(contentType);
+        // 네비게이션 없이 직접 페이지 로드
+        await this.loadPageDirectly(contentType);
+    }
+
+    async loadPageDirectly(contentType) {
+        console.log('=== DIRECT PAGE LOAD ===', contentType);
+        
+        // 메시지 탭 구조 설정
+        const mainContent = document.querySelector('.main-content');
+        if (contentType === 'message' && mainContent) {
+            mainContent.innerHTML = `<div class="main-section-content"></div>`;
+        } else if (mainContent) {
+            mainContent.innerHTML = `
+                <div class="emoji-section">
+                    <div class="main-section-content"></div>
+                </div>
+                <div class="sidebar">
+                    <div class="ad-sidebar">광고 영역</div>
+                </div>
+            `;
         }
+        
+        // 페이지 컨텐츠 로드
+        const contentContainer = document.querySelector('.main-section-content');
+        if (contentContainer) {
+            try {
+                const timestamp = new Date().getTime();
+                const url = `pages/${contentType}.html?v=${timestamp}`;
+                console.log('Loading directly:', url);
+                const response = await fetch(url);
+                if (response.ok) {
+                    const html = await response.text();
+                    contentContainer.innerHTML = html;
+                    console.log('Direct load success:', contentType);
+                    
+                    // 스크립트 실행
+                    this.executePageScripts(contentContainer);
+                }
+            } catch (error) {
+                console.error('Direct page load error:', error);
+            }
+        }
+    }
+
+    executePageScripts(container) {
+        const scripts = container.querySelectorAll('script');
+        scripts.forEach(script => {
+            try {
+                if (!script.src) {
+                    const scriptFunction = new Function(script.textContent);
+                    scriptFunction();
+                }
+            } catch (error) {
+                console.error('Script execution error:', error);
+            }
+        });
     }
 
     // 다른 모듈에서 사용할 수 있는 유틸리티 메서드들

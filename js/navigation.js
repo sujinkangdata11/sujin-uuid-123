@@ -248,7 +248,9 @@ class Navigation {
     
     bindPopState() {
         window.addEventListener('popstate', (event) => {
+            console.log('=== POPSTATE EVENT ===', event.state);
             const contentType = event.state?.contentType || this.getContentTypeFromPath();
+            console.log('Popstate content type:', contentType);
             const targetTab = document.querySelector(`[data-type="${contentType}"]`);
             if (targetTab) {
                 this.handleNavClick(targetTab);
