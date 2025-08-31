@@ -2,17 +2,18 @@
 
 <style>
         .main-chat-area {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 600px; /* 최소 높이로 변경 */
+            height: 600px; /* 고정 높이 */
+            flex: 1; /* 가로 공간을 채움 */
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             overflow: visible;
-            position: sticky;
+            position: sticky; /* 스크롤 시 고정 */
             top: 0;
             z-index: 50;
+            flex-shrink: 0; /* 크기 축소 방지 */
         }
         
         .chat-header {
@@ -283,80 +284,102 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         
-        /* 가로 크기 조절 핸들 (기존) */
+        /* 가로 크기 조절 핸들 - 세팅창용 */
         .resize-handle {
             position: absolute !important;
-            left: -31px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            width: 60px !important;
-            height: 60px !important;
-            background: #007AFF !important;
-            border: 4px solid #ffffff !important;
-            border-radius: 50% !important;
+            left: -10px !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            width: 14px !important;
+            height: 100% !important;
+            background: #e8e8e8 !important;
+            border: none !important;
+            border-radius: 4px !important;
             cursor: col-resize !important;
             z-index: 9999 !important;
             transition: all 0.2s ease !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
         }
         
         .resize-handle::before {
-            content: '⟷' !important;
-            font-size: 24px !important;
-            color: #ffffff !important;
-            font-weight: bold !important;
+            content: '' !important;
+            display: block !important;
+            width: 3px !important;
+            height: 20px !important;
+            background: linear-gradient(to bottom, 
+                #999 0%, #999 2px, 
+                transparent 2px, transparent 4px,
+                #999 4px, #999 6px,
+                transparent 6px, transparent 8px,
+                #999 8px, #999 10px,
+                transparent 10px, transparent 12px,
+                #999 12px, #999 14px,
+                transparent 14px, transparent 16px,
+                #999 16px, #999 18px,
+                transparent 18px, transparent 20px
+            ) !important;
         }
 
-        /* 세로 크기 조절 핸들 - 메시지 타이퍼 블록 중앙 */
+        /* 세로 크기 조절 핸들 - 메시지 타이퍼 블록에만 연결 */
         .resize-handle-vertical {
             position: absolute !important;
-            left: 50% !important; /* 메시지 블럭 중앙 기준 */
-            bottom: -20px !important; /* 메시지 블럭 아래 10px 위치 */
-            transform: translateX(-50%) !important;
-            width: 60px !important;
-            height: 30px !important;
-            background: #34c759 !important;
-            border: 4px solid #ffffff !important;
-            border-radius: 15px !important;
+            left: 10px !important;
+            right: 10px !important;
+            bottom: -20px !important;
+            width: calc(100% - 20px) !important;
+            height: 14px !important;
+            background: #e8e8e8 !important;
+            border: none !important;
+            border-radius: 4px !important;
             cursor: row-resize !important;
             z-index: 9999 !important;
             transition: all 0.2s ease !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
         }
         
         .resize-handle-vertical::before {
-            content: '⇕' !important;
-            font-size: 24px !important;
-            color: #ffffff !important;
-            font-weight: bold !important;
+            content: '' !important;
+            display: block !important;
+            width: 20px !important;
+            height: 3px !important;
+            background: linear-gradient(to right, 
+                #999 0%, #999 2px, 
+                transparent 2px, transparent 4px,
+                #999 4px, #999 6px,
+                transparent 6px, transparent 8px,
+                #999 8px, #999 10px,
+                transparent 10px, transparent 12px,
+                #999 12px, #999 14px,
+                transparent 14px, transparent 16px,
+                #999 16px, #999 18px,
+                transparent 18px, transparent 20px
+            ) !important;
         }
         
         .resize-handle:hover {
-            background: #007AFF;
-            border-color: #007AFF;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-        }
-        
-        .resize-handle:hover::before {
-            color: white;
+            background: #d0d0d0 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
         }
         
         .resize-handle.resizing {
-            background: #007AFF;
-            border-color: #007AFF;
-            transform: translateY(-50%) scale(1.2);
-            box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+            background: #c0c0c0 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         }
         
-        .resize-handle.resizing::before {
-            color: white;
+        .resize-handle-vertical:hover {
+            background: #d0d0d0 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .resize-handle-vertical.resizing {
+            background: #c0c0c0 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         }
 
         /* 메시지 타이퍼용 추가 스타일 */
@@ -918,7 +941,11 @@ class CleanMessageTyper {
         this.updateSpeedGroupVisibility();
         this.addInitialMessages();
         this.updateControlsWidth();
-        this.updateChatAreaHeight(); // 초기 핸들 위치 설정
+        
+        // 초기 설정
+        setTimeout(() => {
+            this.updateControlsWidth();
+        }, 100);
     }
     
     initEventListeners() {
@@ -1108,7 +1135,7 @@ class CleanMessageTyper {
                 if (!this.isResizingVertical) return;
                 
                 const deltaY = e.clientY - startY;
-                const newHeight = Math.max(300, Math.min(window.innerHeight * 0.8, startHeight + deltaY));
+                const newHeight = Math.max(300, startHeight + deltaY);
                 
                 this.currentChatAreaHeight = newHeight;
                 this.updateChatAreaHeight();
@@ -1131,18 +1158,6 @@ class CleanMessageTyper {
     
     updateChatAreaHeight() {
         this.mainChatArea.style.height = this.currentChatAreaHeight + 'px';
-        // 세로 핸들 위치도 같이 업데이트 - 메시지 타이퍼 중앙에 맞춤
-        if (this.resizeHandleVertical && this.mainChatArea) {
-            const chatRect = this.mainChatArea.getBoundingClientRect();
-            const containerRect = document.querySelector('.message-container').getBoundingClientRect();
-            
-            // 메시지 타이퍼 블록의 중앙 위치 계산
-            const centerX = chatRect.left - containerRect.left + (chatRect.width / 2);
-            
-            this.resizeHandleVertical.style.top = (this.currentChatAreaHeight + 10) + 'px';
-            this.resizeHandleVertical.style.left = centerX + 'px';
-            this.resizeHandleVertical.style.transform = 'translateX(-50%)';
-        }
     }
     
     addInitialMessages() {
@@ -1161,7 +1176,7 @@ class CleanMessageTyper {
             <div class="message-content">
                 <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
-                    <select class="message-type-select" style="width: 160px;">
+                    <select class="message-type-select" style="width: 200px;">
                         <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
                         <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
                     </select>
