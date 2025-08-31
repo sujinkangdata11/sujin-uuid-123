@@ -5,11 +5,14 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 40px);
+            min-height: 600px; /* 최소 높이로 변경 */
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
+            overflow: visible;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
         
         .chat-header {
@@ -20,6 +23,9 @@
             flex-shrink: 0;
             height: 80px;
             box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .contact-info h3 {
@@ -42,8 +48,7 @@
             flex: 1;
             padding: calc(20px * var(--message-scale));
             padding-bottom: calc(20px * var(--message-scale));
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: visible;
             background: #ffffff;
             position: relative;
             box-sizing: border-box;
@@ -270,16 +275,15 @@
             width: 300px;
             background: #ffffff;
             padding: 20px;
-            overflow-y: auto;
             overflow-x: visible;
             min-width: 300px;
             max-width: 80vw;
-            height: calc(100vh - 40px);
             flex-shrink: 0;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         
+        /* 가로 크기 조절 핸들 (기존) */
         .resize-handle {
             position: absolute !important;
             left: -31px !important;
@@ -301,6 +305,33 @@
         
         .resize-handle::before {
             content: '⟷' !important;
+            font-size: 24px !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
+        }
+
+        /* 세로 크기 조절 핸들 - 메시지 타이퍼 블록 중앙 */
+        .resize-handle-vertical {
+            position: absolute !important;
+            left: 50% !important; /* 메시지 블럭 중앙 기준 */
+            bottom: -20px !important; /* 메시지 블럭 아래 10px 위치 */
+            transform: translateX(-50%) !important;
+            width: 60px !important;
+            height: 30px !important;
+            background: #34c759 !important;
+            border: 4px solid #ffffff !important;
+            border-radius: 15px !important;
+            cursor: row-resize !important;
+            z-index: 9999 !important;
+            transition: all 0.2s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4) !important;
+        }
+        
+        .resize-handle-vertical::before {
+            content: '⇕' !important;
             font-size: 24px !important;
             color: #ffffff !important;
             font-weight: bold !important;
@@ -433,14 +464,19 @@
         }
         
         .remove-btn {
-            padding: 6px 10px;
-            background: #ff3b30;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            min-width: 50px;
+            padding: 4px 8px !important; /* 패딩 줄임 */
+            background: #ff3b30 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            cursor: pointer !important;
+            width: auto !important; /* 기본 button flex 스타일 무시 */
+            flex: none !important; /* flex: 1 무시 */
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            min-width: auto !important; /* 기본 min-width 제거 */
+            max-width: fit-content !important;
         }
         
         .remove-btn:hover {
@@ -574,17 +610,17 @@
             background: #d70015;
         }
         
-        /* 전체 컨테이너 스타일 - 2블록 나란히 배치 */
+        /* 전체 컨테이너 스타일 - 2블록 나란히 배치 (메시지 탭 전용) */
         .message-container {
             font-family: -apple-system, BlinkMacSystemFont, 'Segue UI', system-ui, sans-serif;
             background: #f5f5f7;
-            height: 100vh;
+            min-height: 100vh;
             overflow: visible;
             display: flex;
             flex-direction: row;
             position: relative;
-            padding: 20px;
-            gap: 2px;
+            padding: 0; /* 메시지 탭 전용: 패딩 제거 */
+            gap: 10px;
             border-radius: 12px;
             max-width: 100%;
             width: 100%;
@@ -609,9 +645,7 @@
             .controls {
                 position: relative;
                 width: 100% !important;
-                height: calc(40vh - 32px);
                 padding: 16px;
-                overflow-y: auto;
                 border-radius: 12px;
             }
             
@@ -659,6 +693,8 @@
                 </div>
             </div>
         </div>
+        <!-- 세로 리사이징 핸들을 메시지 블럭 안으로 이동 -->
+        <div class="resize-handle-vertical" id="resizeHandleVertical"></div>
     </div>
     
     <div class="controls" id="controlsPanel">
@@ -669,9 +705,28 @@
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
                 <input type="file" id="textFileUpload" accept=".txt" style="padding: 10px; border: 2px dashed #007AFF; border-radius: 8px; background: #f8f9ff;">
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button id="showExampleBtn" class="secondary-button" style="padding: 6px 12px; font-size: 14px; margin: 0; flex: none;">텍스트 파일 예시</button>
+                    <button id="showExampleBtn" class="secondary-button" style="padding: 6px 12px; font-size: 14px; margin: 0; flex: none;">텍스트 파일 예시 ▼</button>
                     <div style="font-size: 13px; color: #8e8e93; line-height: 1.4; flex: 1;">
                         <strong>사용법:</strong> "일반 텍스트" → 회색, "//텍스트" → 파란색
+                    </div>
+                </div>
+                
+                <!-- 아코디언 형식 예시 영역 -->
+                <div id="exampleModal" style="display: none; margin-top: 10px; background: #f8f9fa; border: 1px solid #e5e5ea; border-radius: 8px; padding: 15px; transition: all 0.3s ease;">
+                    <h4 style="margin: 0 0 15px 0; font-size: 16px; color: #000;">텍스트 파일 예시</h4>
+                    <div style="background: #ffffff; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 14px; line-height: 1.6; white-space: pre-line; border: 1px solid #d1d1d6;">"오늘 학교 끝나고 뭐 할 거야?"
+"//응… 너랑 같이 문방구 갈래?"
+"좋아! 그럼 새로 나온 젤펜 사자!"
+"//근데… 나 너한테 줄 것도 있어."
+"뭐야? 설마 간식?"
+"//아니… 이거, 우리 반에서 같이 찍은 사진이야."
+"오! 이거 내가 제일 좋아하는 사진이네!"
+"//그래서… 너 생각나서 집에서 꾸며봤어."</div>
+                    <div style="margin-top: 15px; font-size: 13px; color: #8e8e93;">
+                        <strong>설명:</strong><br>
+                        • 따옴표 안의 일반 텍스트는 회색 메시지가 됩니다<br>
+                        • //로 시작하는 텍스트는 파란색 메시지가 됩니다<br>
+                        • 빈 줄은 자동으로 무시됩니다
                     </div>
                 </div>
             </div>
@@ -780,7 +835,9 @@ class CleanMessageTyper {
         this.textFileUpload = document.getElementById('textFileUpload');
         this.showExampleBtn = document.getElementById('showExampleBtn');
         this.resizeHandle = document.getElementById('resizeHandle');
+        this.resizeHandleVertical = document.getElementById('resizeHandleVertical');
         this.controls = document.querySelector('.controls');
+        this.mainChatArea = document.querySelector('.main-chat-area');
         
         this.messages = [];
         this.currentMessageIndex = 0;
@@ -799,7 +856,9 @@ class CleanMessageTyper {
         this.recordTimer = null;
         
         this.isResizing = false;
+        this.isResizingVertical = false;
         this.currentControlsWidth = 400;
+        this.currentChatAreaHeight = 600;
         
         this.initEventListeners();
         this.initResizer();
@@ -808,6 +867,7 @@ class CleanMessageTyper {
         this.updateSpeedGroupVisibility();
         this.addInitialMessages();
         this.updateControlsWidth();
+        this.updateChatAreaHeight(); // 초기 핸들 위치 설정
     }
     
     initEventListeners() {
@@ -833,12 +893,21 @@ class CleanMessageTyper {
         }
         
         if (this.showExampleBtn) {
-            this.showExampleBtn.addEventListener('click', () => this.showExample());
+            this.showExampleBtn.addEventListener('click', () => this.toggleExample());
         }
     }
     
-    showExample() {
-        alert('텍스트 파일 예시:\n\n"안녕하세요!"\n"//네, 안녕하세요!"\n"오늘 날씨가 좋네요."\n"//그러게요. 산책하기 좋을 것 같아요."');
+    toggleExample() {
+        const exampleModal = document.getElementById('exampleModal');
+        if (exampleModal) {
+            const isVisible = exampleModal.style.display !== 'none';
+            exampleModal.style.display = isVisible ? 'none' : 'block';
+            
+            // 화살표 아이콘만 변경
+            if (this.showExampleBtn) {
+                this.showExampleBtn.textContent = isVisible ? '텍스트 파일 예시 ▼' : '텍스트 파일 예시 ▲';
+            }
+        }
     }
     
     handleTextFileUpload(event) {
@@ -905,44 +974,97 @@ class CleanMessageTyper {
     }
     
     initResizer() {
-        if (!this.resizeHandle) return;
-        
-        let startX = 0;
-        let startWidth = 0;
-        
-        this.resizeHandle.addEventListener('mousedown', (e) => {
-            this.isResizing = true;
-            startX = e.clientX;
-            startWidth = this.currentControlsWidth;
+        // 가로 리사이징 (기존)
+        if (this.resizeHandle) {
+            let startX = 0;
+            let startWidth = 0;
             
-            this.resizeHandle.classList.add('resizing');
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-            e.preventDefault();
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (!this.isResizing) return;
+            this.resizeHandle.addEventListener('mousedown', (e) => {
+                this.isResizing = true;
+                startX = e.clientX;
+                startWidth = this.currentControlsWidth;
+                
+                this.resizeHandle.classList.add('resizing');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
             
-            const deltaX = startX - e.clientX;
-            const newWidth = Math.max(300, Math.min(window.innerWidth * 0.8, startWidth + deltaX));
+            document.addEventListener('mousemove', (e) => {
+                if (!this.isResizing) return;
+                
+                const deltaX = startX - e.clientX;
+                const newWidth = Math.max(300, Math.min(window.innerWidth * 0.8, startWidth + deltaX));
+                
+                this.currentControlsWidth = newWidth;
+                this.updateControlsWidth();
+            });
             
-            this.currentControlsWidth = newWidth;
-            this.updateControlsWidth();
-        });
-        
-        document.addEventListener('mouseup', () => {
-            if (this.isResizing) {
-                this.isResizing = false;
-                this.resizeHandle.classList.remove('resizing');
-                document.body.style.cursor = '';
-                document.body.style.userSelect = '';
-            }
-        });
+            document.addEventListener('mouseup', () => {
+                if (this.isResizing) {
+                    this.isResizing = false;
+                    this.resizeHandle.classList.remove('resizing');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+
+        // 세로 리사이징 (새로 추가)
+        if (this.resizeHandleVertical) {
+            let startY = 0;
+            let startHeight = 0;
+            
+            this.resizeHandleVertical.addEventListener('mousedown', (e) => {
+                this.isResizingVertical = true;
+                startY = e.clientY;
+                startHeight = this.currentChatAreaHeight;
+                
+                this.resizeHandleVertical.classList.add('resizing');
+                document.body.style.cursor = 'row-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!this.isResizingVertical) return;
+                
+                const deltaY = e.clientY - startY;
+                const newHeight = Math.max(300, Math.min(window.innerHeight * 0.8, startHeight + deltaY));
+                
+                this.currentChatAreaHeight = newHeight;
+                this.updateChatAreaHeight();
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (this.isResizingVertical) {
+                    this.isResizingVertical = false;
+                    this.resizeHandleVertical.classList.remove('resizing');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
     }
     
     updateControlsWidth() {
         this.controls.style.width = this.currentControlsWidth + 'px';
+    }
+    
+    updateChatAreaHeight() {
+        this.mainChatArea.style.height = this.currentChatAreaHeight + 'px';
+        // 세로 핸들 위치도 같이 업데이트 - 메시지 타이퍼 중앙에 맞춤
+        if (this.resizeHandleVertical && this.mainChatArea) {
+            const chatRect = this.mainChatArea.getBoundingClientRect();
+            const containerRect = document.querySelector('.message-container').getBoundingClientRect();
+            
+            // 메시지 타이퍼 블록의 중앙 위치 계산
+            const centerX = chatRect.left - containerRect.left + (chatRect.width / 2);
+            
+            this.resizeHandleVertical.style.top = (this.currentChatAreaHeight + 10) + 'px';
+            this.resizeHandleVertical.style.left = centerX + 'px';
+            this.resizeHandleVertical.style.transform = 'translateX(-50%)';
+        }
     }
     
     addInitialMessages() {
@@ -960,15 +1082,13 @@ class CleanMessageTyper {
             <div class="message-number">${this.messageCounter}</div>
             <div class="message-content">
                 <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
-                <div style="margin-top: 8px;">
-                    <select class="message-type-select">
+                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                    <select class="message-type-select" style="width: 160px;">
                         <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
                         <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
                     </select>
+                    <button class="remove-btn" onclick="this.closest('.message-item').remove()">삭제</button>
                 </div>
-            </div>
-            <div class="message-controls">
-                <button class="remove-btn" onclick="this.closest('.message-item').remove()">삭제</button>
             </div>
         `;
         
