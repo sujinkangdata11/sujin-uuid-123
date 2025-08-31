@@ -24,8 +24,8 @@ class App {
                 this.navigation = new window.Navigation();
             }
 
-            // 기본 페이지(이모지) 로드
-            await this.loadDefaultPage();
+            // URL 기반 탭 상태 우선 처리 (기본 페이지 로드 전에)
+            await this.handleInitialTab();
 
             console.log('앱이 성공적으로 초기화되었습니다.');
         } catch (error) {
@@ -33,13 +33,25 @@ class App {
         }
     }
 
-    async loadDefaultPage() {
-        // URL 파라미터나 현재 탭 상태를 확인하여 적절한 페이지 로드
+    async handleInitialTab() {
+        // URL 파라미터 우선 확인
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
-        const activeTab = document.querySelector('.nav-item.active');
-        const contentType = tabParam || (activeTab ? activeTab.dataset.type : 'emoji');
+        let contentType = tabParam || 'emoji';
         
+        console.log('Initial tab detection:', { tabParam, contentType });
+        
+        // 모든 탭에서 active 제거
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        // URL 기준 탭 활성화
+        const targetTab = document.querySelector(`[data-type="${contentType}"]`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+            console.log('Tab activated:', contentType);
+        }
+        
+        // 네비게이션 초기 URL 처리 방지하고 직접 컨텐츠 로드
         if (this.navigation) {
             await this.navigation.loadPageContent(contentType);
         }

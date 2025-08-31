@@ -9,7 +9,7 @@ class Navigation {
     init() {
         console.log('Navigation init called');
         this.bindEvents();
-        this.handleInitialUrl();
+        // handleInitialUrl 제거 - main.js에서 처리
         this.bindPopState();
         console.log('Navigation init completed');
     }
