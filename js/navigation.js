@@ -244,14 +244,15 @@ class Navigation {
     handleInitialUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
+        let contentType = tabParam || 'emoji';
         
-        // 현재 활성 탭을 확인하여 상태 유지
-        const activeTab = document.querySelector('.nav-item.active');
-        let contentType = tabParam || (activeTab ? activeTab.dataset.type : 'emoji');
+        // 모든 탭에서 active 클래스 제거하고 URL 기준으로 설정
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         
         // 해당 탭 활성화
         const targetTab = document.querySelector(`[data-type="${contentType}"]`);
         if (targetTab) {
+            targetTab.classList.add('active');
             this.handleNavClick(targetTab);
         }
     }
