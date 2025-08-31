@@ -34,9 +34,14 @@ class App {
     }
 
     async loadDefaultPage() {
-        // 기본적으로 이모지 페이지를 로드
+        // URL 파라미터나 현재 탭 상태를 확인하여 적절한 페이지 로드
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        const activeTab = document.querySelector('.nav-item.active');
+        const contentType = tabParam || (activeTab ? activeTab.dataset.type : 'emoji');
+        
         if (this.navigation) {
-            await this.navigation.loadPageContent('emoji');
+            await this.navigation.loadPageContent(contentType);
         }
     }
 

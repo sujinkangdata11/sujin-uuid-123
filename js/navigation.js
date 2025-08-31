@@ -46,6 +46,9 @@ class Navigation {
             newUrl = window.location.origin + window.location.pathname + '?tab=' + contentType;
         }
         
+        // 현재 URL을 즉시 업데이트하여 새로고침 시에도 상태 유지
+        window.history.replaceState({ contentType }, '', newUrl);
+        
         console.log('Current URL before change:', window.location.href);
         console.log('New URL to set:', newUrl);
         
@@ -241,7 +244,10 @@ class Navigation {
     handleInitialUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
-        let contentType = tabParam || 'emoji'; // 기본값
+        
+        // 현재 활성 탭을 확인하여 상태 유지
+        const activeTab = document.querySelector('.nav-item.active');
+        let contentType = tabParam || (activeTab ? activeTab.dataset.type : 'emoji');
         
         // 해당 탭 활성화
         const targetTab = document.querySelector(`[data-type="${contentType}"]`);
