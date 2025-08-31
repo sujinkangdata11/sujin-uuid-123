@@ -39,7 +39,11 @@ class App {
         const tabParam = urlParams.get('tab');
         let contentType = tabParam || 'emoji';
         
-        console.log('Initial tab detection:', { tabParam, contentType });
+        console.log('=== INITIAL TAB DEBUG ===');
+        console.log('Current URL:', window.location.href);
+        console.log('URL params:', urlParams.toString());
+        console.log('Tab param:', tabParam);
+        console.log('Content type:', contentType);
         
         // 모든 탭에서 active 제거
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -48,7 +52,24 @@ class App {
         const targetTab = document.querySelector(`[data-type="${contentType}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
-            console.log('Tab activated:', contentType);
+            console.log('Tab activated:', contentType, targetTab);
+        }
+        
+        // 메시지 탭인 경우 강제로 레이아웃 설정
+        if (contentType === 'message') {
+            console.log('=== MESSAGE TAB FORCED SETUP ===');
+            document.body.classList.add('message-tab-active');
+            
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const floatingBox = document.querySelector('.floating-emoji-box');
+            
+            if (sidebar) sidebar.style.display = 'none';
+            if (floatingBox) floatingBox.style.display = 'none';
+            if (mainContent) {
+                mainContent.style.gridTemplateColumns = '1fr';
+                mainContent.style.gap = '0';
+            }
         }
         
         // 네비게이션 초기 URL 처리 방지하고 직접 컨텐츠 로드

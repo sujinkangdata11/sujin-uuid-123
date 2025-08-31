@@ -170,13 +170,17 @@ class Navigation {
             // 페이지 파일 로딩 (캐시 방지를 위한 타임스탬프 추가)
             const timestamp = new Date().getTime();
             const url = `pages/${contentType}.html?v=${timestamp}`;
+            console.log('=== LOADING PAGE ===');
+            console.log('Content type:', contentType);
             console.log('Fetching:', url);
             const response = await fetch(url);
             console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
             if (response.ok) {
                 const html = await response.text();
                 console.log('HTML content length:', html.length);
                 console.log('HTML preview:', html.substring(0, 200));
+                console.log('Is message tab?', contentType === 'message');
                 contentContainer.innerHTML = html;
                 
                 // 페이지별 초기화
@@ -241,21 +245,6 @@ class Navigation {
         });
     }
     
-    handleInitialUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const tabParam = urlParams.get('tab');
-        let contentType = tabParam || 'emoji';
-        
-        // 모든 탭에서 active 클래스 제거하고 URL 기준으로 설정
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        
-        // 해당 탭 활성화
-        const targetTab = document.querySelector(`[data-type="${contentType}"]`);
-        if (targetTab) {
-            targetTab.classList.add('active');
-            this.handleNavClick(targetTab);
-        }
-    }
     
     bindPopState() {
         window.addEventListener('popstate', (event) => {
