@@ -442,13 +442,15 @@
         .message-content {
             flex: 1;
             min-width: 200px;
+            max-width: 100%;
         }
         
         .message-controls {
             display: flex;
             gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
         }
         
         .handle-number-container {
@@ -493,6 +495,8 @@
             background: #ffffff;
             font-size: 16px;
             min-width: 100px;
+            max-width: 200px;
+            width: 200px;
             height: 48px;
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -500,6 +504,7 @@
             background-position: right 12px center;
             background-size: 16px;
             padding-right: 60px;
+            flex-shrink: 0;
         }
         
         .message-type-select:focus {
@@ -530,22 +535,86 @@
         .arrow-icon.up::after {
             transform: translate(-50%, -30%) rotate(-135deg);
         }
+
+        ////미디어/// CSS 스타일 시작 ////
+        /* 미디어 관련 CSS - 현재 주석 처리됨 */
+        /*
+        .content-type-toggle {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .content-type-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .media-upload-area {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .media-upload-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e5e5ea;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .media-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #e5e5ea;
+            display: none;
+        }
+
+        .video-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #e5e5ea;
+            display: none;
+        }
+
+        .share-icon {
+            width: calc(16px * var(--message-scale) * 0.9);
+            height: calc(16px * var(--message-scale) * 0.9);
+        }
+
+        .message.image-message::before,
+        .message.image-message::after {
+            display: none;
+        }
+
+        .message-group .message:not(:last-child)::before,
+        .message-group .message:not(:last-child)::after {
+            display: none;
+        }
+        */
+        ////미디어/// CSS 스타일 끝 ////
         
         .remove-btn {
             padding: 0 !important;
             background: #ff3b30 !important;
             color: white !important;
             border: none !important;
-            border-radius: 50% !important;
-            font-size: 16px !important;
+            border-radius: 100px !important;
+            font-size: 18px !important;
             cursor: pointer !important;
-            width: 34px !important;
-            height: 34px !important;
-            min-width: 34px !important;
-            max-width: 34px !important;
-            min-height: 34px !important;
-            max-height: 34px !important;
-            flex: 0 0 34px !important;
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            min-height: 30px !important;
+            max-height: 30px !important;
+            flex: 0 0 30px !important;
             flex-shrink: 0 !important;
             display: flex !important;
             align-items: center !important;
@@ -555,7 +624,19 @@
         }
         
         .remove-btn:hover {
-            background: #d70015;
+            background: #d70015 !important;
+        }
+        
+        /* 삭제 버튼이 다른 스타일에 덮어쓰이지 않도록 더 구체적으로 지정 */
+        .message-item .remove-btn,
+        button.remove-btn {
+            background: #ff3b30 !important;
+            color: white !important;
+        }
+        
+        .message-item .remove-btn:hover,
+        button.remove-btn:hover {
+            background: #d70015 !important;
         }
         
         .add-message-btn {
@@ -652,6 +733,64 @@
             font-family: inherit;
             flex: 1;
             min-width: 80px;
+        }
+        
+        /* 삭제 버튼 컴포넌트 */
+        .delete-button {
+            padding: 0 !important;
+            background: #ff3b30 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 100px !important;
+            font-size: 18px !important;
+            cursor: pointer !important;
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            min-height: 30px !important;
+            max-height: 30px !important;
+            flex: none !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .delete-button:hover {
+            background: #d70015 !important;
+            transform: scale(1.1) !important;
+        }
+        
+        .delete-button:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* 기존 remove-btn도 호환성을 위해 유지 */
+        .remove-btn {
+            padding: 0 !important;
+            background: #ff3b30 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 100px !important;
+            font-size: 18px !important;
+            cursor: pointer !important;
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            min-height: 30px !important;
+            max-height: 30px !important;
+            flex: none !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
         }
         
         button:hover {
@@ -778,7 +917,13 @@
         <div class="control-group">
             <label>📁 텍스트 파일 업로드</label>
             <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
-                <input type="file" id="textFileUpload" accept=".txt" style="height: 50px; border-radius: 12px; padding: 12px 10px 18px 10px; border: 2px dashed #007AFF; background: #f8f9ff; text-align: center; width: 100%; box-sizing: border-box;">
+                <div style="position: relative; width: 100%;">
+                    <input type="file" id="textFileUpload" accept=".txt" style="height: 50px; border-radius: 12px; padding: 12px 10px 18px 10px; border: 2px dashed #007AFF; background: #f8f9ff; text-align: center; width: 100%; box-sizing: border-box; opacity: 0; position: absolute; cursor: pointer;">
+                    <div style="height: 50px; border-radius: 12px; border: 2px dashed #007AFF; background: #f8f9ff; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('textFileUpload').click()">
+                        <span style="color: #007AFF; font-weight: 500;">파일선택</span>
+                        <span id="uploadedFileName" style="font-size: 14px; color: #8e8e93; font-style: italic;"></span>
+                    </div>
+                </div>
                 <div>
                     <button id="showExampleBtn" class="secondary-button" style="height: 40px; border-radius: 12px; padding: 0 12px; font-size: 14px; margin: 0; flex: none; display: flex; align-items: center; gap: 4px;">텍스트 파일 예시 <span id="exampleArrow" class="arrow-icon"></span></button>
                 </div>
@@ -910,6 +1055,7 @@ class CleanMessageTyper {
         
         this.loopMode = document.getElementById('loopMode');
         this.textFileUpload = document.getElementById('textFileUpload');
+        this.uploadedFileName = document.getElementById('uploadedFileName');
         this.showExampleBtn = document.getElementById('showExampleBtn');
         this.listToggleBtn = document.getElementById('listToggleBtn');
         this.toggleIcon = document.getElementById('toggleIcon');
@@ -944,12 +1090,11 @@ class CleanMessageTyper {
         this.updateSpeedDisplay();
         this.updateScaleDisplay();
         this.updateSpeedGroupVisibility();
-        this.addInitialMessages();
-        this.updateControlsWidth();
         
-        // 초기 설정
+        // 초기 설정 및 메시지 추가를 지연 실행
         setTimeout(() => {
             this.updateControlsWidth();
+            this.addInitialMessages();
         }, 100);
     }
     
@@ -1025,7 +1170,15 @@ class CleanMessageTyper {
         if (!file || !file.name.toLowerCase().endsWith('.txt')) {
             alert('텍스트 파일(.txt)만 업로드 가능합니다.');
             event.target.value = '';
+            if (this.uploadedFileName) {
+                this.uploadedFileName.textContent = '';
+            }
             return;
+        }
+        
+        // 파일명 표시
+        if (this.uploadedFileName) {
+            this.uploadedFileName.textContent = file.name;
         }
         
         const reader = new FileReader();
@@ -1033,11 +1186,15 @@ class CleanMessageTyper {
             try {
                 const content = e.target.result;
                 this.parseTextFile(content);
+                // 파일 처리 후 input은 초기화하지만 파일명은 유지
                 event.target.value = '';
             } catch (error) {
                 console.error('Error reading file:', error);
                 alert('파일을 읽는 중 오류가 발생했습니다.');
                 event.target.value = '';
+                if (this.uploadedFileName) {
+                    this.uploadedFileName.textContent = '';
+                }
             }
         };
         reader.readAsText(file, 'UTF-8');
@@ -1166,32 +1323,160 @@ class CleanMessageTyper {
     }
     
     addInitialMessages() {
+        console.log('addInitialMessages 함수 호출됨');
+        console.log('messageList 엘리먼트:', this.messageList);
+        console.log('messageList display 상태:', this.messageList ? this.messageList.style.display : 'messageList가 null');
+        
         this.addMessage('안녕하세요! 반갑습니다.', 'received');
         this.addMessage('네, 잘 지내고 있어요!', 'sent');
+        
+        console.log('초기 메시지 2개 추가 완료');
+        console.log('현재 messageList 내용:', this.messageList ? this.messageList.innerHTML : 'messageList가 null');
     }
     
+    // 삭제 버튼 컴포넌트 생성 함수
+    createDeleteButton(clickHandler) {
+        const button = document.createElement('button');
+        button.className = 'delete-button';
+        button.innerHTML = '×';
+        button.onclick = clickHandler;
+        return button;
+    }
+
     addMessage(text = '', type = 'received') {
         const messageItem = document.createElement('div');
         messageItem.className = 'message-item';
-        messageItem.innerHTML = `
-            <div class="handle-number-container">
-                <div class="drag-handle"></div>
-                <div class="message-number">${this.messageCounter}</div>
-            </div>
-            <div class="message-content">
-                <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
-                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
-                    <select class="message-type-select" style="width: 200px;">
-                        <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
-                        <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
-                    </select>
-                    <button class="remove-btn" onclick="this.closest('.message-item').remove()">×</button>
-                </div>
-            </div>
+        
+        // 메시지 컨텐츠 생성
+        const handleContainer = document.createElement('div');
+        handleContainer.className = 'handle-number-container';
+        handleContainer.innerHTML = `
+            <div class="drag-handle"></div>
+            <div class="message-number">${this.messageCounter}</div>
         `;
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        
+        const textarea = document.createElement('textarea');
+        textarea.className = 'message-input';
+        textarea.placeholder = '메시지를 입력하세요';
+        textarea.rows = 3;
+        textarea.value = text;
+        
+        const controls = document.createElement('div');
+        controls.className = 'message-controls';
+        controls.style.marginTop = '8px';
+        
+        const select = document.createElement('select');
+        select.className = 'message-type-select';
+        select.innerHTML = `
+            <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
+            <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
+        `;
+        
+        // 삭제 버튼 컴포넌트 생성
+        const deleteButton = this.createDeleteButton(() => {
+            messageItem.remove();
+        });
+        
+        // 요소들 조립
+        controls.appendChild(select);
+        controls.appendChild(deleteButton);
+        messageContent.appendChild(textarea);
+        messageContent.appendChild(controls);
+        messageItem.appendChild(handleContainer);
+        messageItem.appendChild(messageContent);
         
         this.messageList.appendChild(messageItem);
         
+        ////미디어/// JavaScript 이벤트 리스너 시작 ////
+        /* 미디어 관련 JavaScript - 현재 주석 처리됨
+        const mediaCheckbox = messageItem.querySelector('.media-checkbox');
+        const mediaRadios = messageItem.querySelectorAll('.media-type-radio');
+        const mediaArea = messageItem.querySelector('.media-upload-area');
+        const mediaInput = messageItem.querySelector('.media-upload-input');
+        const mediaPreview = messageItem.querySelector('.media-preview');
+        const videoPreview = messageItem.querySelector('.video-preview');
+        const fileInfo = messageItem.querySelector('.file-info');
+        
+        if (mediaCheckbox) {
+            mediaCheckbox.addEventListener('change', () => {
+                if (mediaCheckbox.checked) {
+                    mediaArea.style.display = 'block';
+                    const imageRadio = mediaArea.querySelector('input[value="image"]');
+                    imageRadio.checked = true;
+                    mediaInput.accept = 'image/*';
+                } else {
+                    mediaArea.style.display = 'none';
+                    mediaInput.value = '';
+                    mediaPreview.style.display = 'none';
+                    videoPreview.style.display = 'none';
+                    fileInfo.textContent = '';
+                }
+            });
+        }
+        
+        if (mediaRadios) {
+            mediaRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const selectedValue = radio.value;
+                    if (selectedValue === 'image') {
+                        mediaInput.accept = 'image/*';
+                        videoPreview.style.display = 'none';
+                        if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('video/')) {
+                            mediaInput.value = '';
+                            fileInfo.textContent = '';
+                        }
+                    } else if (selectedValue === 'video') {
+                        mediaInput.accept = 'video/*';
+                        mediaPreview.style.display = 'none';
+                        if (mediaInput.files[0] && mediaInput.files[0].type.startsWith('image/')) {
+                            mediaInput.value = '';
+                            fileInfo.textContent = '';
+                        }
+                    }
+                });
+            });
+        }
+        
+        if (mediaInput) {
+            mediaInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const maxSize = 5 * 1024 * 1024;
+                    if (file.size > maxSize) {
+                        alert('파일 크기가 5MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+                        mediaInput.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (file.type.startsWith('image/')) {
+                            mediaPreview.src = e.target.result;
+                            mediaPreview.style.display = 'block';
+                            videoPreview.style.display = 'none';
+                        } else if (file.type.startsWith('video/')) {
+                            videoPreview.src = e.target.result;
+                            videoPreview.style.display = 'block';
+                            mediaPreview.style.display = 'none';
+                        }
+                        
+                        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                        fileInfo.textContent = `${file.name} (${sizeInMB}MB)`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    mediaPreview.style.display = 'none';
+                    videoPreview.style.display = 'none';
+                    fileInfo.textContent = '';
+                }
+            });
+        }
+        */
+        ////미디어/// JavaScript 이벤트 리스너 끝 ////
+
         const textInput = messageItem.querySelector('.message-input');
         textInput.addEventListener('input', () => {
             textInput.style.height = 'auto';
@@ -1292,6 +1577,89 @@ class CleanMessageTyper {
         
         const messageGroup = document.createElement('div');
         messageGroup.className = `message-group ${message.type}`;
+        
+        ////미디어/// 메시지 타이핑 시 미디어 처리 시작 ////
+        /* 미디어 관련 메시지 표시 로직 - 현재 주석 처리됨
+        if (message.hasMedia) {
+            const mediaContainer = document.createElement('div');
+            mediaContainer.className = `message ${message.type} image-message`;
+            mediaContainer.style.cssText = `
+                padding: 0px;
+                background: transparent;
+                display: flex;
+                align-items: center;
+                gap: calc(8px * var(--message-scale));
+            `;
+            
+            const mediaEl = document.createElement('div');
+            mediaEl.style.position = 'relative';
+            
+            if (message.mediaType === 'image') {
+                const img = document.createElement('img');
+                img.src = message.mediaSrc;
+                img.style.cssText = `
+                    width: calc(200px * var(--message-scale));
+                    height: auto;
+                    border-radius: calc(18px * var(--message-scale));
+                    display: block;
+                `;
+                mediaEl.appendChild(img);
+            } else if (message.mediaType === 'video') {
+                const video = document.createElement('video');
+                video.src = message.mediaSrc;
+                video.style.cssText = `
+                    width: calc(200px * var(--message-scale));
+                    height: auto;
+                    border-radius: calc(18px * var(--message-scale));
+                    display: block;
+                `;
+                video.controls = true;
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = false;
+                video.playsInline = true;
+                mediaEl.appendChild(video);
+            }
+            
+            const shareBtn = document.createElement('div');
+            shareBtn.className = 'share-button';
+            shareBtn.style.cssText = `
+                width: calc(32px * var(--message-scale));
+                height: calc(32px * var(--message-scale));
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: calc(1px * var(--message-scale)) solid #e5e5ea;
+                align-self: center;
+            `;
+            
+            shareBtn.innerHTML = `
+                <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            `;
+            
+            shareBtn.addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.href = message.mediaSrc;
+                link.download = `media_${Date.now()}.${message.mediaType === 'image' ? 'jpg' : 'mp4'}`;
+                link.click();
+            });
+            
+            mediaContainer.appendChild(mediaEl);
+            mediaContainer.appendChild(shareBtn);
+            messageGroup.appendChild(mediaContainer);
+        }
+        */
+        ////미디어/// 메시지 타이핑 시 미디어 처리 끝 ////
         
         const textEl = document.createElement('div');
         textEl.className = `message ${message.type}`;
