@@ -470,17 +470,17 @@
         }
         
         .message-input {
-            flex: 1;
+            width: 100%;
             padding: 8px 12px;
             border: 1px solid #e5e5ea;
             border-radius: 12px;
             font-size: 15px;
             background: #ffffff;
-            min-width: 300px;
             resize: vertical;
             min-height: 60px;
             font-family: inherit;
             line-height: 1.8;
+            box-sizing: border-box;
         }
         
         .message-input:focus {
@@ -1232,11 +1232,7 @@ class CleanMessageTyper {
             }
         });
         
-        if (addedCount > 0) {
-            alert(`✅ ${addedCount}개의 메시지가 추가되었습니다!`);
-        } else {
-            alert('⚠️ 유효한 메시지가 없습니다.');
-        }
+        // 메시지 추가 완료 - 알림 없이 조용히 처리
     }
     
     initResizer() {
