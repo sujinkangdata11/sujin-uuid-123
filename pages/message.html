@@ -49,10 +49,15 @@
             flex: 1;
             padding: calc(20px * var(--message-scale));
             padding-bottom: calc(20px * var(--message-scale));
-            overflow: visible;
+            overflow-y: auto;
+            overflow-x: hidden;
             background: #ffffff;
             position: relative;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%; /* 부모 높이를 넘지 않도록 */
+            min-height: 0; /* flex 아이템이 축소될 수 있도록 */
         }
         
         .messages-container::-webkit-scrollbar {
@@ -80,9 +85,9 @@
         .messages-wrapper {
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
-            min-height: 100%;
-            gap: calc(1px * var(--message-scale));
+            gap: calc(12px * var(--message-scale));
+            justify-content: flex-end; /* 메시지들을 하단부터 시작 */
+            min-height: 100%; /* 컨테이너를 가득 채워야 justify-content가 작동 */
         }
         
         .message-group {
