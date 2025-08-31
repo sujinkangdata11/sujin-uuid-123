@@ -371,7 +371,7 @@
             margin-bottom: 12px;
             padding: 12px;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid #e5e5ea;
             flex-wrap: wrap;
             cursor: move;
@@ -423,25 +423,34 @@
             flex-wrap: wrap;
         }
         
-        .message-number {
+        .handle-number-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 4px;
             min-width: 30px;
+        }
+        
+        .message-number {
             font-weight: 600;
             color: #8e8e93;
             font-size: 14px;
+            text-align: center;
         }
         
         .message-input {
             flex: 1;
             padding: 8px 12px;
             border: 1px solid #e5e5ea;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 15px;
             background: #ffffff;
             min-width: 300px;
             resize: vertical;
             min-height: 60px;
             font-family: inherit;
-            line-height: 1.4;
+            line-height: 1.8;
         }
         
         .message-input:focus {
@@ -452,10 +461,17 @@
         .message-type-select {
             padding: 8px 12px;
             border: 1px solid #e5e5ea;
-            border-radius: 6px;
+            border-radius: 12px;
             background: #ffffff;
-            font-size: 14px;
+            font-size: 16px;
             min-width: 100px;
+            height: 48px;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 60px;
         }
         
         .message-type-select:focus {
@@ -463,20 +479,51 @@
             border-color: #007AFF;
         }
         
+        /* 화살표 컴포넌트 */
+        .arrow-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            position: relative;
+        }
+        
+        .arrow-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: translate(-50%, -70%) rotate(45deg);
+        }
+        
+        .arrow-icon.up::after {
+            transform: translate(-50%, -30%) rotate(-135deg);
+        }
+        
         .remove-btn {
-            padding: 4px 8px !important; /* 패딩 줄임 */
+            padding: 0 !important;
             background: #ff3b30 !important;
             color: white !important;
             border: none !important;
-            border-radius: 4px !important;
-            font-size: 12px !important;
+            border-radius: 50% !important;
+            font-size: 16px !important;
             cursor: pointer !important;
-            width: auto !important; /* 기본 button flex 스타일 무시 */
-            flex: none !important; /* flex: 1 무시 */
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            min-height: 34px !important;
+            max-height: 34px !important;
+            flex: 0 0 34px !important;
             flex-shrink: 0 !important;
-            white-space: nowrap !important;
-            min-width: auto !important; /* 기본 min-width 제거 */
-            max-width: fit-content !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
         }
         
         .remove-btn:hover {
@@ -511,7 +558,7 @@
         .control-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 16px;
+            font-size: 18px;
             color: #000;
             font-weight: 500;
         }
@@ -701,18 +748,15 @@
         <div class="resize-handle" id="resizeHandle"></div>
         
         <div class="control-group">
-            <label>📁 텍스트 파일 업로드:</label>
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                <input type="file" id="textFileUpload" accept=".txt" style="padding: 10px; border: 2px dashed #007AFF; border-radius: 8px; background: #f8f9ff;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <button id="showExampleBtn" class="secondary-button" style="padding: 6px 12px; font-size: 14px; margin: 0; flex: none;">텍스트 파일 예시 ▼</button>
-                    <div style="font-size: 13px; color: #8e8e93; line-height: 1.4; flex: 1;">
-                        <strong>사용법:</strong> "일반 텍스트" → 회색, "//텍스트" → 파란색
-                    </div>
+            <label>📁 텍스트 파일 업로드</label>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
+                <input type="file" id="textFileUpload" accept=".txt" style="height: 50px; border-radius: 12px; padding: 12px 10px 18px 10px; border: 2px dashed #007AFF; background: #f8f9ff; text-align: center; width: 100%; box-sizing: border-box;">
+                <div>
+                    <button id="showExampleBtn" class="secondary-button" style="height: 40px; border-radius: 12px; padding: 0 12px; font-size: 14px; margin: 0; flex: none; display: flex; align-items: center; gap: 4px;">텍스트 파일 예시 <span id="exampleArrow" class="arrow-icon"></span></button>
                 </div>
                 
                 <!-- 아코디언 형식 예시 영역 -->
-                <div id="exampleModal" style="display: none; margin-top: 10px; background: #f8f9fa; border: 1px solid #e5e5ea; border-radius: 8px; padding: 15px; transition: all 0.3s ease;">
+                <div id="exampleModal" style="display: none; margin-top: -5px; background: #f8f9fa; border: 1px solid #e5e5ea; border-radius: 8px; padding: 15px; transition: all 0.3s ease;">
                     <h4 style="margin: 0 0 15px 0; font-size: 16px; color: #000;">텍스트 파일 예시</h4>
                     <div style="background: #ffffff; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 14px; line-height: 1.6; white-space: pre-line; border: 1px solid #d1d1d6;">"오늘 학교 끝나고 뭐 할 거야?"
 "//응… 너랑 같이 문방구 갈래?"
@@ -722,50 +766,55 @@
 "//아니… 이거, 우리 반에서 같이 찍은 사진이야."
 "오! 이거 내가 제일 좋아하는 사진이네!"
 "//그래서… 너 생각나서 집에서 꾸며봤어."</div>
-                    <div style="margin-top: 15px; font-size: 13px; color: #8e8e93;">
-                        <strong>설명:</strong><br>
-                        • 따옴표 안의 일반 텍스트는 회색 메시지가 됩니다<br>
-                        • //로 시작하는 텍스트는 파란색 메시지가 됩니다<br>
+                    <div style="margin-top: 15px; font-size: 15px; line-height: 1.8; color: #8e8e93;">
+                        <strong style="color: #000;">설명</strong><br>
+                        • 따옴표 안의 일반 텍스트는 ⚪ 회색 메시지가 됩니다<br>
+                        • //로 시작하는 텍스트는 🔵 파란색 메시지가 됩니다<br>
                         • 빈 줄은 자동으로 무시됩니다
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="control-group">
-            <label>메시지 목록:</label>
-            <div class="message-list" id="messageList"></div>
-            <button class="add-message-btn" id="addMessageBtn">+ 메시지 추가</button>
+        <div class="control-group" style="padding-top: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <label style="margin-bottom: 0;">메시지 목록</label>
+                <button class="list-toggle-btn" id="listToggleBtn" style="background: #f2f2f7; color: #007AFF; border: none; border-radius: 12px; padding: 6px 12px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; height: 40px; width: 120px; flex: none;">
+                    목록 보기 <span id="toggleIcon" class="arrow-icon up"></span>
+                </button>
+            </div>
+            <div class="message-list" id="messageList" style="display: block;"></div>
+            <button class="add-message-btn" id="addMessageBtn" style="display: block;">+ 메시지 추가</button>
         </div>
         
-        <div class="control-group">
-            <label>메시지 크기:</label>
+        <div class="control-group" style="padding-top: 40px;">
+            <label>메시지 크기</label>
             <div class="slider-container">
                 <input type="range" id="scaleSlider" min="50" max="200" value="100">
                 <span class="speed-value" id="scaleValue">100%</span>
             </div>
         </div>
         
-        <div class="control-group">
-            <label>재생 옵션:</label>
+        <div class="control-group" style="padding-top: 40px;">
+            <label>재생 옵션</label>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; margin-bottom: 0;">
-                    <input type="checkbox" id="loopMode">
+                <label style="display: flex; align-items: center; gap: 5px; font-size: 16px; margin-bottom: 0;">
+                    <input type="checkbox" id="loopMode" style="width: 16px; height: 16px;">
                     🔄 무한 반복 재생
                 </label>
             </div>
         </div>
         
-        <div class="control-group">
-            <label>타이핑 모드:</label>
+        <div class="control-group" style="padding-top: 40px;">
+            <label>타이핑 모드</label>
             <select id="typingMode" class="message-type-select" style="width: 100%;">
                 <option value="character">⌨️ 한 글자씩 타이핑</option>
                 <option value="instant">⚡ 즉시 전체 표시</option>
             </select>
         </div>
         
-        <div class="control-group" id="speedGroup">
-            <label>타이핑 속도:</label>
+        <div class="control-group" id="speedGroup" style="padding-top: 40px;">
+            <label>타이핑 속도</label>
             <div class="slider-container">
                 <input type="range" id="speedSlider" min="50" max="300" value="100">
                 <span class="speed-value" id="speedValue">100ms</span>
@@ -780,8 +829,8 @@
             </div>
         </div>
         
-        <div class="control-group">
-            <label>🎥 화면 녹화:</label>
+        <div class="control-group" style="padding-top: 40px;">
+            <label>🎥 화면 녹화</label>
             <div class="button-group">
                 <button id="recordBtn" style="background: #ff3b30;">● 녹화 시작</button>
                 <button id="stopRecordBtn" class="secondary-button" disabled>⏹ 녹화 정지</button>
@@ -834,6 +883,8 @@ class CleanMessageTyper {
         this.loopMode = document.getElementById('loopMode');
         this.textFileUpload = document.getElementById('textFileUpload');
         this.showExampleBtn = document.getElementById('showExampleBtn');
+        this.listToggleBtn = document.getElementById('listToggleBtn');
+        this.toggleIcon = document.getElementById('toggleIcon');
         this.resizeHandle = document.getElementById('resizeHandle');
         this.resizeHandleVertical = document.getElementById('resizeHandleVertical');
         this.controls = document.querySelector('.controls');
@@ -895,17 +946,44 @@ class CleanMessageTyper {
         if (this.showExampleBtn) {
             this.showExampleBtn.addEventListener('click', () => this.toggleExample());
         }
+        
+        if (this.listToggleBtn) {
+            this.listToggleBtn.addEventListener('click', () => this.toggleMessageList());
+        }
     }
     
     toggleExample() {
         const exampleModal = document.getElementById('exampleModal');
+        const exampleArrow = document.getElementById('exampleArrow');
+        
         if (exampleModal) {
             const isVisible = exampleModal.style.display !== 'none';
             exampleModal.style.display = isVisible ? 'none' : 'block';
             
-            // 화살표 아이콘만 변경
-            if (this.showExampleBtn) {
-                this.showExampleBtn.textContent = isVisible ? '텍스트 파일 예시 ▼' : '텍스트 파일 예시 ▲';
+            // 화살표 방향 변경
+            if (exampleArrow) {
+                if (isVisible) {
+                    exampleArrow.classList.remove('up');
+                } else {
+                    exampleArrow.classList.add('up');
+                }
+            }
+        }
+    }
+    
+    toggleMessageList() {
+        const isVisible = this.messageList.style.display !== 'none';
+        
+        // 메시지 목록과 추가 버튼 토글
+        this.messageList.style.display = isVisible ? 'none' : 'block';
+        this.addMessageBtn.style.display = isVisible ? 'none' : 'block';
+        
+        // 화살표 방향 변경
+        if (this.toggleIcon) {
+            if (isVisible) {
+                this.toggleIcon.classList.remove('up');
+            } else {
+                this.toggleIcon.classList.add('up');
             }
         }
     }
@@ -1070,16 +1148,16 @@ class CleanMessageTyper {
     addInitialMessages() {
         this.addMessage('안녕하세요! 반갑습니다.', 'received');
         this.addMessage('네, 잘 지내고 있어요!', 'sent');
-        this.addMessage('깔끔한 메시지 스타일이에요.', 'received');
-        this.addMessage('스크롤 테스트를 위해 메시지를 더 추가해볼게요.', 'sent');
     }
     
     addMessage(text = '', type = 'received') {
         const messageItem = document.createElement('div');
         messageItem.className = 'message-item';
         messageItem.innerHTML = `
-            <div class="drag-handle"></div>
-            <div class="message-number">${this.messageCounter}</div>
+            <div class="handle-number-container">
+                <div class="drag-handle"></div>
+                <div class="message-number">${this.messageCounter}</div>
+            </div>
             <div class="message-content">
                 <textarea class="message-input" placeholder="메시지를 입력하세요" rows="3">${text}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
@@ -1087,7 +1165,7 @@ class CleanMessageTyper {
                         <option value="received" ${type === 'received' ? 'selected' : ''}>⚪ 받은 메시지</option>
                         <option value="sent" ${type === 'sent' ? 'selected' : ''}>🔵 보낸 메시지</option>
                     </select>
-                    <button class="remove-btn" onclick="this.closest('.message-item').remove()">삭제</button>
+                    <button class="remove-btn" onclick="this.closest('.message-item').remove()">×</button>
                 </div>
             </div>
         `;
